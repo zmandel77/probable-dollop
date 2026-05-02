@@ -67,11 +67,13 @@ hr{border:none;border-top:1px solid rgba(80,80,120,0.2);margin:.5rem 0}
 <script>
 /* ── clock ── */
 function tick(){
+  const tz='America/New_York';
   const n=new Date();
-  let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
-  const ap=h>=12?'pm':'am'; h=h%12||12;
-  document.getElementById('d').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  document.getElementById('t').childNodes[0].nodeValue=h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).formatToParts(n);
+  const get=t=>parts.find(p=>p.type===t)?.value||'';
+  let h=get('hour'),m=get('minute'),s=get('second'),ap=get('dayperiod').toLowerCase();
+  document.getElementById('d').textContent=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'long',month:'long',day:'numeric',year:'numeric'}).format(n);
+  document.getElementById('t').childNodes[0].nodeValue=h+':'+m+':'+s;
   document.getElementById('ap').textContent=ap;
 }
 tick();setInterval(tick,1000);
