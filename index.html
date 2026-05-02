@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>widget</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#F5F0E8;font-family:'Courier New',Courier,monospace;color:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.w{padding:2rem 2.5rem;width:100%;max-width:480px}
+.date{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#666;margin-bottom:.25rem}
+.time{font-size:52px;line-height:1;margin-bottom:.75rem}
+.ampm{font-size:18px;color:#666;margin-left:4px}
+hr{border:none;border-top:1px solid #c8c0b0;margin:.6rem 0}
+.weather-row{display:flex;align-items:center;gap:1.25rem;margin-top:.5rem}
+.temp{font-size:30px;display:block}
+.desc{font-size:13px;color:#555;font-style:italic;margin-top:2px}
+.loc{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-top:.3rem}
+#sky{flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="date" id="d">—</div>
+  <div class="time" id="t">—<span class="ampm" id="ap"></span></div>
+  <hr>
+  <div class="weather-row">
+    <svg id="sky" width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div>
+      <span class="temp" id="temp">—</span>
+      <span class="desc" id="desc">loading...</span>
+      <div class="loc" id="loc"></div>
+    </div>
+  </div>
+</div>
+<script>
+function tick(){
+  const n=new Date();
+  let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  const ap=h>=12?'pm':'am';
+  h=h%12||12;
+  document.getElementById('d').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('t').childNodes[0].nodeValue=(h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'));
+  document.getElementById('ap').textContent=ap;
+}
+tick();setInterval(tick,1000);
+
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs)e.setAttribute(k,attrs[k]);
+  return e;
+}
+function anim(e,attr,vals,dur,delay){
+  const a=el('animate',{attributeName:attr,values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',calcMode:'easeInOut'});
+  e.appendChild(a);return e;
+}
+function transAnim(e,vals,dur,delay){
+  const a=el('animateTransform',{attributeName:'transform',type:'translate',values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',additive:'sum'});
+  e.appendChild(a);return e;
+}
+
+const D='#2e2c2c', M='#5a5656', L='#8a8686', XL='#b8b4b4';
+
+function cloud(svg,cx,cy,op,dx,dur){
+  const g=el('g',{opacity:op});
+  g.appendChild(el('ellipse',{cx:cx,cy:cy,rx:16,ry:10,fill:D}));
+  g.appendChild(el('ellipse',{cx:cx-12,cy:cy+4,rx:11,ry:8,fill:D}));
+  g.appendChild(el('ellipse',{cx:cx+12,cy:cy+4,rx:10,ry:7,fill:D}));
+  transAnim(g,'0,0;'+dx+',0;0,0',dur,0);
+  svg.appendChild(g);
+}
+
+function drawClear(svg){
+  const sun=el('circle',{cx:36,cy:36,r:13,fill:D,opacity:'0.88'});
+  anim(sun,'r','13;15;13','4',0);
+  svg.appendChild(sun);
+  [0,45,90,135,180,225,270,315].forEach(a=>{
+    const r=a*Math.PI/180;
+    const ray=el('line',{x1:36+19*Math.cos(r),y1:36+19*Math.sin(r),x2:36+26*Math.cos(r),y2:36+26*Math.sin(r),stroke:M,'stroke-width':'1.5','stroke-linecap':'round'});
+    anim(ray,'opacity','0.7;0.2;0.7','4',a/360*4);
+    svg.appendChild(ray);
+  });
+}
+
+function drawPartlyCloudy(svg){
+  const sun=el('circle',{cx:22,cy:27,r:10,fill:M,opacity:'0.65'});
+  anim(sun,'cy','27;25;27','3',0);
+  svg.appendChild(sun);
+  [0,45,90,135,180,225,270,315].forEach(a=>{
+    const r=a*Math.PI/180;
+    const ray=el('line',{x1:22+14*Math.cos(r),y1:27+14*Math.sin(r),x2:22+19*Math.cos(r),y2:27+19*Math.sin(r),stroke:L,'stroke-width':'1.2','stroke-linecap':'round',opacity:'0.5'});
+    anim(ray,'opacity','0.5;0.15;0.5','3',a/360*3);
+    svg.appendChild(ray);
+  });
+  cloud(svg,40,44,1,3,5);
+}
+
+function drawCloudy(svg){
+  cloud(svg,38,38,0.45,2,7);
+  cloud(svg,36,46,1,3,5);
+}
+
+function drawDrizzle(svg){
+  cloud(svg,36,38,0.8,2,6);
+  [[26,54,0],[34,58,0.4],[42,54,0.8],[38,62,1.2]].forEach(([x,y,dl])=>{
+    const d=el('line',{x1:x,y1:y,x2:x-2,y2:y+5,stroke:L,'stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});
+    anim(d,'opacity','0;0.6;0',1.5,dl);
+    svg.appendChild(d);
+  });
+}
+
+function drawRain(svg){
+  cloud(svg,36,40,1,3,5);
+  [[26,56,0],[34,60,0.4],[42,56,0.8],[30,64,1.2],[46,62,0.6]].forEach(([x,y,dl])=>{
+    const d=el('line',{x1:x,y1:y,x2:x-3,y2:y+7,stroke:M,'stroke-width':'1.3','stroke-linecap':'round',opacity:'0'});
+    anim(d,'opacity','0;0.85;0',1.2,dl);
+    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;-2,6',dur:'1.2s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
+    d.appendChild(mv);
+    svg.appendChild(d);
+  });
+}
+
+function drawSnow(svg){
+  cloud(svg,36,40,1,2,6);
+  [[26,56,0],[36,60,0.6],[45,56,1.1],[32,65,1.6],[46,64,0.9]].forEach(([x,y,dl])=>{
+    const g=el('g');
+    [0,60,120].forEach(a=>{
+      const r=a*Math.PI/180;
+      const ln=el('line',{x1:x-4*Math.cos(r),y1:y-4*Math.sin(r),x2:x+4*Math.cos(r),y2:y+4*Math.sin(r),stroke:M,'stroke-width':'1.2','stroke-linecap':'round'});
+      g.appendChild(ln);
+    });
+    anim(g,'opacity','0;0.9;0',2,dl);
+    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;1,7',dur:'2s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
+    g.appendChild(mv);
+    svg.appendChild(g);
+  });
+}
+
+function drawFog(svg){
+  [[8,28,52,0],[8,38,44,0.4],[8,48,50,0.8],[8,58,36,1.2]].forEach(([x,y,w,dl])=>{
+    const ln=el('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:M,'stroke-width':'1.5','stroke-linecap':'round',opacity:'0.55'});
+    anim(ln,'opacity','0.55;0.18;0.55',3,dl);
+    transAnim(ln,'0,0;5,0;0,0',3,dl);
+    svg.appendChild(ln);
+  });
+}
+
+function drawThunder(svg){
+  drawRain(svg);
+  const bolt=el('polygon',{points:'40,18 33,36 39,36 31,56 46,32 39,32 46,18',fill:D,opacity:'0'});
+  const a=el('animate',{attributeName:'opacity',values:'0;0;0;1;0.8;0;0;0;0;1;0;0',dur:'3.5s',repeatCount:'indefinite'});
+  bolt.appendChild(a);
+  svg.appendChild(bolt);
+}
+
+function drawNight(svg){
+  const outer=el('circle',{cx:38,cy:36,r:15,fill:D,opacity:'0.92'});
+  const inner=el('circle',{cx:44,cy:30,r:13,fill:'#F5F0E8'});
+  anim(outer,'opacity','0.92;0.7;0.92','4',0);
+  svg.appendChild(outer);svg.appendChild(inner);
+  [[16,16,1.1],[12,36,1.9],[20,52,0.7],[8,26,2.4],[14,46,1.5]].forEach(([x,y,dl])=>{
+    const s=el('circle',{cx:x,cy:y,r:1.3,fill:M});
+    anim(s,'opacity','0;0.9;0',2.5,dl);
+    svg.appendChild(s);
+  });
+}
+
+function getDrawFn(code,isNight){
+  if(isNight&&(code===0||code===1))return drawNight;
+  if(code===0||code===1)return drawClear;
+  if(code===2)return drawPartlyCloudy;
+  if(code===3)return drawCloudy;
+  if(code===45||code===48)return drawFog;
+  if(code>=51&&code<=55)return drawDrizzle;
+  if(code>=61&&code<=65)return drawRain;
+  if(code>=71&&code<=75)return drawSnow;
+  if(code>=80&&code<=82)return drawRain;
+  if(code>=95&&code<=99)return drawThunder;
+  return drawCloudy;
+}
+
+const wcodes={0:'clear',1:'mainly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'rain',71:'snow',73:'snow',75:'snow',80:'showers',81:'showers',82:'showers',95:'thunderstorm',96:'thunderstorm',99:'thunderstorm'};
+
+navigator.geolocation&&navigator.geolocation.getCurrentPosition(function(p){
+  fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.coords.latitude+'&longitude='+p.coords.longitude+'&current_weather=true&temperature_unit=fahrenheit')
+  .then(r=>r.json()).then(d=>{
+    const c=d.current_weather;
+    document.getElementById('temp').textContent=Math.round(c.temperature)+'°F';
+    document.getElementById('desc').textContent=wcodes[c.weathercode]||'';
+    getDrawFn(c.weathercode,c.is_day===0)(document.getElementById('sky'));
+    fetch('https://nominatim.openstreetmap.org/reverse?lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&format=json')
+    .then(r=>r.json()).then(g=>{
+      const city=g.address.city||g.address.town||g.address.village||'';
+      const state=g.address.state_code||g.address.state||'';
+      document.getElementById('loc').textContent=city+(state?', '+state:'');
+    });
+  });
+},()=>{document.getElementById('desc').textContent='allow location for weather';});
+</script>
+</body>
+</html>
