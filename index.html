@@ -3,200 +3,373 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>widget</title>
+<title>Worcester</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#F5F0E8;font-family:'Courier New',Courier,monospace;color:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.w{padding:2rem 2.5rem;width:100%;max-width:480px}
-.date{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#666;margin-bottom:.25rem}
-.time{font-size:52px;line-height:1;margin-bottom:.75rem}
-.ampm{font-size:18px;color:#666;margin-left:4px}
-hr{border:none;border-top:1px solid #c8c0b0;margin:.6rem 0}
-.weather-row{display:flex;align-items:center;gap:1.25rem;margin-top:.5rem}
-.temp{font-size:30px;display:block}
-.desc{font-size:13px;color:#555;font-style:italic;margin-top:2px}
-.loc{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-top:.3rem}
-#sky{flex-shrink:0}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  background:#D6E8F5;
+  font-family:'Courier New',Courier,monospace;
+  color:#1a1a1a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background 2s ease;
+}
+#scene{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  z-index:0;
+}
+.card{
+  position:relative;
+  z-index:10;
+  background:rgba(214,232,245,0.55);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,0.45);
+  border-radius:8px;
+  padding:2rem 2.5rem;
+  max-width:380px;
+  width:90%;
+}
+.date{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#557;margin-bottom:.2rem}
+.time{font-size:50px;line-height:1;margin-bottom:.6rem;color:#1a1a1a}
+.ampm{font-size:17px;color:#667;margin-left:4px}
+hr{border:none;border-top:1px solid rgba(80,80,120,0.2);margin:.5rem 0}
+.wrow{display:flex;align-items:center;gap:1.2rem;margin-top:.4rem}
+#icon{flex-shrink:0}
+.temp{font-size:28px;display:block;color:#1a1a1a}
+.desc{font-size:12px;color:#556;font-style:italic;margin-top:2px}
+.loc{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#889;margin-top:.25rem}
 </style>
 </head>
 <body>
-<div class="w">
+
+<svg id="scene" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"></svg>
+
+<div class="card">
   <div class="date" id="d">—</div>
   <div class="time" id="t">—<span class="ampm" id="ap"></span></div>
   <hr>
-  <div class="weather-row">
-    <svg id="sky" width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="wrow">
+    <svg id="icon" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
     <div>
       <span class="temp" id="temp">—</span>
       <span class="desc" id="desc">loading...</span>
-      <div class="loc" id="loc"></div>
+      <div class="loc">Worcester, MA</div>
     </div>
   </div>
 </div>
+
 <script>
+/* ── clock ── */
 function tick(){
   const n=new Date();
   let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
-  const ap=h>=12?'pm':'am';
-  h=h%12||12;
+  const ap=h>=12?'pm':'am'; h=h%12||12;
   document.getElementById('d').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  document.getElementById('t').childNodes[0].nodeValue=(h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'));
+  document.getElementById('t').childNodes[0].nodeValue=h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
   document.getElementById('ap').textContent=ap;
 }
 tick();setInterval(tick,1000);
 
+/* ── SVG helpers ── */
 const NS='http://www.w3.org/2000/svg';
-function el(tag,attrs){
-  const e=document.createElementNS(NS,tag);
-  for(const k in attrs)e.setAttribute(k,attrs[k]);
-  return e;
-}
-function anim(e,attr,vals,dur,delay){
-  const a=el('animate',{attributeName:attr,values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',calcMode:'easeInOut'});
+function el(tag,a){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function anim(e,attr,vals,dur,delay,calc){
+  const a=el('animate',{attributeName:attr,values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',calcMode:calc||'easeInOut'});
   e.appendChild(a);return e;
 }
-function transAnim(e,vals,dur,delay){
+function tanim(e,vals,dur,delay){
   const a=el('animateTransform',{attributeName:'transform',type:'translate',values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',additive:'sum'});
   e.appendChild(a);return e;
 }
+function ranim(e,vals,dur,delay){
+  const a=el('animateTransform',{attributeName:'transform',type:'rotate',values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite'});
+  e.appendChild(a);return e;
+}
 
-const D='#2e2c2c', M='#5a5656', L='#8a8686', XL='#b8b4b4';
+const D='#2e2c2c',M='#5a5656',L='#8a8686',XL='#b8b4b4';
 
-function cloud(svg,cx,cy,op,dx,dur){
+/* ── small icon (card) ── */
+function iconCloud(svg,cx,cy,op){
   const g=el('g',{opacity:op});
-  g.appendChild(el('ellipse',{cx:cx,cy:cy,rx:16,ry:10,fill:D}));
-  g.appendChild(el('ellipse',{cx:cx-12,cy:cy+4,rx:11,ry:8,fill:D}));
-  g.appendChild(el('ellipse',{cx:cx+12,cy:cy+4,rx:10,ry:7,fill:D}));
-  transAnim(g,'0,0;'+dx+',0;0,0',dur,0);
+  g.appendChild(el('ellipse',{cx,cy,rx:14,ry:9,fill:D}));
+  g.appendChild(el('ellipse',{cx:cx-10,cy:cy+4,rx:10,ry:7,fill:D}));
+  g.appendChild(el('ellipse',{cx:cx+10,cy:cy+4,rx:9,ry:6,fill:D}));
+  tanim(g,'0,0;3,0;0,0',5,0);
   svg.appendChild(g);
 }
-
-function drawClear(svg){
-  const sun=el('circle',{cx:36,cy:36,r:13,fill:D,opacity:'0.88'});
-  anim(sun,'r','13;15;13','4',0);
-  svg.appendChild(sun);
+function drawIconClear(svg){
+  const sun=el('circle',{cx:32,cy:32,r:11,fill:D,opacity:'0.88'});
+  anim(sun,'r','11;13;11',4,0);svg.appendChild(sun);
   [0,45,90,135,180,225,270,315].forEach(a=>{
     const r=a*Math.PI/180;
-    const ray=el('line',{x1:36+19*Math.cos(r),y1:36+19*Math.sin(r),x2:36+26*Math.cos(r),y2:36+26*Math.sin(r),stroke:M,'stroke-width':'1.5','stroke-linecap':'round'});
-    anim(ray,'opacity','0.7;0.2;0.7','4',a/360*4);
-    svg.appendChild(ray);
+    const ray=el('line',{x1:32+15*Math.cos(r),y1:32+15*Math.sin(r),x2:32+21*Math.cos(r),y2:32+21*Math.sin(r),stroke:M,'stroke-width':'1.4','stroke-linecap':'round'});
+    anim(ray,'opacity','0.7;0.2;0.7',4,a/360*4);svg.appendChild(ray);
   });
 }
-
-function drawPartlyCloudy(svg){
-  const sun=el('circle',{cx:22,cy:27,r:10,fill:M,opacity:'0.65'});
-  anim(sun,'cy','27;25;27','3',0);
-  svg.appendChild(sun);
-  [0,45,90,135,180,225,270,315].forEach(a=>{
-    const r=a*Math.PI/180;
-    const ray=el('line',{x1:22+14*Math.cos(r),y1:27+14*Math.sin(r),x2:22+19*Math.cos(r),y2:27+19*Math.sin(r),stroke:L,'stroke-width':'1.2','stroke-linecap':'round',opacity:'0.5'});
-    anim(ray,'opacity','0.5;0.15;0.5','3',a/360*3);
-    svg.appendChild(ray);
-  });
-  cloud(svg,40,44,1,3,5);
+function drawIconPartly(svg){
+  const sun=el('circle',{cx:20,cy:24,r:9,fill:M,opacity:'0.65'});
+  anim(sun,'cy','24;22;24',3,0);svg.appendChild(sun);
+  iconCloud(svg,36,40,1);
 }
-
-function drawCloudy(svg){
-  cloud(svg,38,38,0.45,2,7);
-  cloud(svg,36,46,1,3,5);
-}
-
-function drawDrizzle(svg){
-  cloud(svg,36,38,0.8,2,6);
-  [[26,54,0],[34,58,0.4],[42,54,0.8],[38,62,1.2]].forEach(([x,y,dl])=>{
-    const d=el('line',{x1:x,y1:y,x2:x-2,y2:y+5,stroke:L,'stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});
-    anim(d,'opacity','0;0.6;0',1.5,dl);
-    svg.appendChild(d);
+function drawIconCloudy(svg){iconCloud(svg,32,34,0.4);iconCloud(svg,32,42,1);}
+function drawIconRain(svg){
+  iconCloud(svg,32,36,1);
+  [[22,50,0],[30,54,0.4],[38,50,0.8],[26,58,1.2],[42,56,0.6]].forEach(([x,y,dl])=>{
+    const d=el('line',{x1:x,y1:y,x2:x-3,y2:y+6,stroke:M,'stroke-width':'1.2','stroke-linecap':'round',opacity:'0'});
+    anim(d,'opacity','0;0.8;0',1.2,dl);
+    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;-2,5',dur:'1.2s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
+    d.appendChild(mv);svg.appendChild(d);
   });
 }
-
-function drawRain(svg){
-  cloud(svg,36,40,1,3,5);
-  [[26,56,0],[34,60,0.4],[42,56,0.8],[30,64,1.2],[46,62,0.6]].forEach(([x,y,dl])=>{
-    const d=el('line',{x1:x,y1:y,x2:x-3,y2:y+7,stroke:M,'stroke-width':'1.3','stroke-linecap':'round',opacity:'0'});
-    anim(d,'opacity','0;0.85;0',1.2,dl);
-    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;-2,6',dur:'1.2s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
-    d.appendChild(mv);
-    svg.appendChild(d);
-  });
-}
-
-function drawSnow(svg){
-  cloud(svg,36,40,1,2,6);
-  [[26,56,0],[36,60,0.6],[45,56,1.1],[32,65,1.6],[46,64,0.9]].forEach(([x,y,dl])=>{
+function drawIconSnow(svg){
+  iconCloud(svg,32,36,1);
+  [[22,50,0],[32,54,0.6],[41,50,1.1],[28,60,1.6],[43,58,0.9]].forEach(([x,y,dl])=>{
     const g=el('g');
     [0,60,120].forEach(a=>{
       const r=a*Math.PI/180;
-      const ln=el('line',{x1:x-4*Math.cos(r),y1:y-4*Math.sin(r),x2:x+4*Math.cos(r),y2:y+4*Math.sin(r),stroke:M,'stroke-width':'1.2','stroke-linecap':'round'});
-      g.appendChild(ln);
+      g.appendChild(el('line',{x1:x-4*Math.cos(r),y1:y-4*Math.sin(r),x2:x+4*Math.cos(r),y2:y+4*Math.sin(r),stroke:M,'stroke-width':'1.1','stroke-linecap':'round'}));
     });
     anim(g,'opacity','0;0.9;0',2,dl);
-    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;1,7',dur:'2s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
-    g.appendChild(mv);
-    svg.appendChild(g);
+    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;1,6',dur:'2s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
+    g.appendChild(mv);svg.appendChild(g);
   });
 }
-
-function drawFog(svg){
-  [[8,28,52,0],[8,38,44,0.4],[8,48,50,0.8],[8,58,36,1.2]].forEach(([x,y,w,dl])=>{
-    const ln=el('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:M,'stroke-width':'1.5','stroke-linecap':'round',opacity:'0.55'});
+function drawIconFog(svg){
+  [[6,24,50,0],[6,34,42,0.4],[6,44,48,0.8],[6,54,34,1.2]].forEach(([x,y,w,dl])=>{
+    const ln=el('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:M,'stroke-width':'1.4','stroke-linecap':'round',opacity:'0.55'});
     anim(ln,'opacity','0.55;0.18;0.55',3,dl);
-    transAnim(ln,'0,0;5,0;0,0',3,dl);
-    svg.appendChild(ln);
+    tanim(ln,'0,0;4,0;0,0',3,dl);svg.appendChild(ln);
   });
 }
-
-function drawThunder(svg){
-  drawRain(svg);
-  const bolt=el('polygon',{points:'40,18 33,36 39,36 31,56 46,32 39,32 46,18',fill:D,opacity:'0'});
+function drawIconThunder(svg){
+  drawIconRain(svg);
+  const bolt=el('polygon',{points:'36,16 29,32 35,32 27,50 42,28 35,28 41,16',fill:D,opacity:'0'});
   const a=el('animate',{attributeName:'opacity',values:'0;0;0;1;0.8;0;0;0;0;1;0;0',dur:'3.5s',repeatCount:'indefinite'});
-  bolt.appendChild(a);
-  svg.appendChild(bolt);
+  bolt.appendChild(a);svg.appendChild(bolt);
 }
-
-function drawNight(svg){
-  const outer=el('circle',{cx:38,cy:36,r:15,fill:D,opacity:'0.92'});
-  const inner=el('circle',{cx:44,cy:30,r:13,fill:'#F5F0E8'});
-  anim(outer,'opacity','0.92;0.7;0.92','4',0);
+function drawIconNight(svg){
+  const outer=el('circle',{cx:34,cy:32,r:13,fill:D,opacity:'0.92'});
+  const inner=el('circle',{cx:40,cy:26,r:11,fill:'#D6E8F5'});
+  anim(outer,'opacity','0.92;0.7;0.92',4,0);
   svg.appendChild(outer);svg.appendChild(inner);
-  [[16,16,1.1],[12,36,1.9],[20,52,0.7],[8,26,2.4],[14,46,1.5]].forEach(([x,y,dl])=>{
-    const s=el('circle',{cx:x,cy:y,r:1.3,fill:M});
-    anim(s,'opacity','0;0.9;0',2.5,dl);
-    svg.appendChild(s);
+  [[14,14,1],[10,30,1.8],[18,48,0.7],[8,22,2.3]].forEach(([x,y,dl])=>{
+    const s=el('circle',{cx:x,cy:y,r:1.2,fill:M});
+    anim(s,'opacity','0;0.9;0',2.5,dl);svg.appendChild(s);
   });
 }
 
-function getDrawFn(code,isNight){
-  if(isNight&&(code===0||code===1))return drawNight;
-  if(code===0||code===1)return drawClear;
-  if(code===2)return drawPartlyCloudy;
-  if(code===3)return drawCloudy;
-  if(code===45||code===48)return drawFog;
-  if(code>=51&&code<=55)return drawDrizzle;
-  if(code>=61&&code<=65)return drawRain;
-  if(code>=71&&code<=75)return drawSnow;
-  if(code>=80&&code<=82)return drawRain;
-  if(code>=95&&code<=99)return drawThunder;
-  return drawCloudy;
+/* ── BIG SCENE background elements ── */
+function clearScene(svg){svg.innerHTML='';}
+
+/* floating cloud factory */
+function sceneCloud(svg,x,y,scale,op,speed,delay){
+  const g=el('g',{opacity:op,transform:'translate('+x+','+y+') scale('+scale+')'});
+  g.appendChild(el('ellipse',{cx:0,cy:0,rx:60,ry:32,fill:D}));
+  g.appendChild(el('ellipse',{cx:-44,cy:12,rx:38,ry:26,fill:D}));
+  g.appendChild(el('ellipse',{cx:44,cy:12,rx:36,ry:24,fill:D}));
+  /* drift across screen */
+  const a=el('animateTransform',{attributeName:'transform',type:'translate',values:'-200,'+y+';1200,'+y,dur:speed+'s',begin:delay+'s',repeatCount:'indefinite',calcMode:'linear'});
+  g.appendChild(a);
+  svg.appendChild(g);
 }
 
+function buildClearScene(svg){
+  /* soft sun top-right */
+  const g=el('g',{opacity:'0.12'});
+  const sun=el('circle',{cx:860,cy:80,r:110,fill:D});
+  anim(sun,'r','110;120;110',6,0);g.appendChild(sun);
+  [0,30,60,90,120,150,180,210,240,270,300,330].forEach(a=>{
+    const r=a*Math.PI/180,r1=el('line',{x1:860+130*Math.cos(r),y1:80+130*Math.sin(r),x2:860+170*Math.cos(r),y2:80+170*Math.sin(r),stroke:D,'stroke-width':'4','stroke-linecap':'round'});
+    anim(r1,'opacity','0.8;0.2;0.8',5,a/360*5);g.appendChild(r1);
+  });
+  svg.appendChild(g);
+  /* few wispy clouds */
+  sceneCloud(svg,-200,120,0.6,0.07,60,0);
+  sceneCloud(svg,-200,350,0.4,0.05,80,20);
+  /* gentle birds */
+  for(let i=0;i<5;i++){
+    const bx=100+i*180, by=80+i*30;
+    const b=el('path',{d:'M'+bx+','+by+' q5,-6 10,0 q5,6 10,0',stroke:D,'stroke-width':'1.2',fill:'none',opacity:'0'});
+    anim(b,'opacity','0;0.18;0.18;0',8+i*2,i*3);
+    tanim(b,'0,0;'+(30+i*10)+','+(i%2?5:-5)+';60,0',8+i*2,i*3);
+    svg.appendChild(b);
+  }
+}
+
+function buildCloudyScene(svg){
+  sceneCloud(svg,-200,60,1.2,0.09,55,0);
+  sceneCloud(svg,-200,200,0.9,0.07,70,15);
+  sceneCloud(svg,-200,380,1.0,0.08,65,30);
+  sceneCloud(svg,-200,480,0.7,0.06,90,5);
+  sceneCloud(svg,-200,140,0.5,0.05,100,45);
+}
+
+function buildPartlyScene(svg){
+  buildClearScene(svg);
+  sceneCloud(svg,-200,180,0.8,0.08,65,10);
+  sceneCloud(svg,-200,420,0.6,0.06,85,35);
+}
+
+function buildRainScene(svg){
+  buildCloudyScene(svg);
+  /* rain streaks */
+  for(let i=0;i<40;i++){
+    const x=Math.random()*1000, y=Math.random()*600;
+    const drop=el('line',{x1:x,y1:y,x2:x-6,y2:y+18,stroke:M,'stroke-width':'0.8',opacity:'0'});
+    const dur=0.8+Math.random()*0.6;
+    const dl=Math.random()*dur;
+    anim(drop,'opacity','0;0.4;0',dur,dl,'linear');
+    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;-10,30',dur:dur+'s',begin:dl+'s',repeatCount:'indefinite',additive:'sum',calcMode:'linear'});
+    drop.appendChild(mv);svg.appendChild(drop);
+  }
+}
+
+function buildSnowScene(svg){
+  buildCloudyScene(svg);
+  for(let i=0;i<35;i++){
+    const x=Math.random()*1000, y=Math.random()*600;
+    const g=el('g',{opacity:'0'});
+    [0,60,120].forEach(a=>{
+      const r=a*Math.PI/180;
+      g.appendChild(el('line',{x1:x-5*Math.cos(r),y1:y-5*Math.sin(r),x2:x+5*Math.cos(r),y2:y+5*Math.sin(r),stroke:XL,'stroke-width':'1','stroke-linecap':'round'}));
+    });
+    const dur=2+Math.random()*2, dl=Math.random()*dur;
+    anim(g,'opacity','0;0.5;0',dur,dl,'easeInOut');
+    const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;'+(Math.random()*20-10)+','+(30+Math.random()*20),dur:dur+'s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
+    g.appendChild(mv);svg.appendChild(g);
+  }
+}
+
+function buildFogScene(svg){
+  for(let i=0;i<8;i++){
+    const y=40+i*70, w=300+Math.random()*400, x=Math.random()*600;
+    const ln=el('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:M,'stroke-width':'18','stroke-linecap':'round',opacity:'0'});
+    const dur=4+Math.random()*4, dl=Math.random()*dur;
+    anim(ln,'opacity','0;0.08;0',dur,dl,'easeInOut');
+    tanim(ln,'0,0;'+(20+Math.random()*30)+',0;0,0',dur,dl);
+    svg.appendChild(ln);
+  }
+}
+
+function buildThunderScene(svg){
+  buildRainScene(svg);
+  /* big background flashes */
+  for(let i=0;i<3;i++){
+    const flash=el('rect',{x:0,y:0,width:1000,height:600,fill:'#fff',opacity:'0'});
+    const a=el('animate',{attributeName:'opacity',values:'0;0;0;0.08;0;0;0;0;0.06;0',dur:(5+i*3)+'s',begin:(i*2.5)+'s',repeatCount:'indefinite'});
+    flash.appendChild(a);svg.appendChild(flash);
+  }
+  /* big bolts */
+  for(let i=0;i<3;i++){
+    const bx=200+i*300;
+    const bolt=el('polygon',{points:`${bx},20 ${bx-30},160 ${bx-10},160 ${bx-50},340 ${bx+40},140 ${bx+10},140 ${bx+50},20`,fill:D,opacity:'0'});
+    const a=el('animate',{attributeName:'opacity',values:'0;0;0;0.2;0.15;0;0;0;0;0.18;0;0',dur:(6+i*2)+'s',begin:(i*2)+'s',repeatCount:'indefinite'});
+    bolt.appendChild(a);svg.appendChild(bolt);
+  }
+}
+
+function buildNightScene(svg){
+  /* big moon */
+  const g=el('g',{opacity:'0.1'});
+  const outer=el('circle',{cx:820,cy:90,r:80,fill:D});
+  const inner=el('circle',{cx:850,cy:60,r:68,fill:'#D6E8F5'});
+  anim(outer,'opacity','1;0.75;1',5,0);
+  g.appendChild(outer);g.appendChild(inner);svg.appendChild(g);
+  /* stars */
+  for(let i=0;i<60;i++){
+    const x=Math.random()*1000, y=Math.random()*500;
+    const s=el('circle',{cx:x,cy:y,r:0.8+Math.random()*1.2,fill:D,opacity:'0'});
+    const dur=2+Math.random()*4, dl=Math.random()*dur;
+    anim(s,'opacity','0;0.25;0',dur,dl,'easeInOut');
+    svg.appendChild(s);
+  }
+  /* shooting star occasionally */
+  const ss=el('line',{x1:200,y1:80,x2:200,y2:80,stroke:M,'stroke-width':'1.5',opacity:'0'});
+  const ssAnim=el('animate',{attributeName:'opacity',values:'0;0;0;0;0.6;0;0;0;0;0',dur:'10s',repeatCount:'indefinite'});
+  const ssPos=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;0,0;0,0;0,0;300,150;320,160;0,0',dur:'10s',repeatCount:'indefinite',additive:'sum'});
+  ss.appendChild(ssAnim);ss.appendChild(ssPos);svg.appendChild(ss);
+}
+
+/* ── weather code maps ── */
 const wcodes={0:'clear',1:'mainly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'rain',71:'snow',73:'snow',75:'snow',80:'showers',81:'showers',82:'showers',95:'thunderstorm',96:'thunderstorm',99:'thunderstorm'};
 
-navigator.geolocation&&navigator.geolocation.getCurrentPosition(function(p){
-  fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.coords.latitude+'&longitude='+p.coords.longitude+'&current_weather=true&temperature_unit=fahrenheit')
-  .then(r=>r.json()).then(d=>{
-    const c=d.current_weather;
-    document.getElementById('temp').textContent=Math.round(c.temperature)+'°F';
-    document.getElementById('desc').textContent=wcodes[c.weathercode]||'';
-    getDrawFn(c.weathercode,c.is_day===0)(document.getElementById('sky'));
-    fetch('https://nominatim.openstreetmap.org/reverse?lat='+p.coords.latitude+'&lon='+p.coords.longitude+'&format=json')
-    .then(r=>r.json()).then(g=>{
-      const city=g.address.city||g.address.town||g.address.village||'';
-      const state=g.address.state_code||g.address.state||'';
-      document.getElementById('loc').textContent=city+(state?', '+state:'');
-    });
-  });
-},()=>{document.getElementById('desc').textContent='allow location for weather';});
+const bgMap={
+  clear:'#C8DFF5',
+  partly:'#C8DFF5',
+  cloudy:'#BFD0E0',
+  rain:'#B0C4D8',
+  snow:'#D8E8F2',
+  fog:'#C8D0D8',
+  thunder:'#9AAAB8',
+  night:'#1A2A3A'
+};
+
+function getType(code,isNight){
+  if(isNight&&(code<=1))return'night';
+  if(code<=1)return'clear';
+  if(code===2)return'partly';
+  if(code===3)return'cloudy';
+  if(code===45||code===48)return'fog';
+  if(code>=51&&code<=55)return'rain';
+  if(code>=61&&code<=65)return'rain';
+  if(code>=71&&code<=75)return'snow';
+  if(code>=80&&code<=82)return'rain';
+  if(code>=95)return'thunder';
+  return'cloudy';
+}
+
+function applyWeather(code,isNight){
+  const type=getType(code,isNight);
+  /* bg color */
+  document.body.style.background=bgMap[type]||'#C8DFF5';
+  /* card blur tint */
+  const card=document.querySelector('.card');
+  card.style.background=isNight?'rgba(20,30,50,0.55)':'rgba(214,232,245,0.55)';
+  if(isNight){card.style.color='#d0d8e8';}
+
+  /* scene */
+  const scene=document.getElementById('scene');
+  clearScene(scene);
+  if(type==='clear')buildClearScene(scene);
+  else if(type==='partly')buildPartlyScene(scene);
+  else if(type==='cloudy')buildCloudyScene(scene);
+  else if(type==='rain')buildRainScene(scene);
+  else if(type==='snow')buildSnowScene(scene);
+  else if(type==='fog')buildFogScene(scene);
+  else if(type==='thunder')buildThunderScene(scene);
+  else if(type==='night')buildNightScene(scene);
+
+  /* small icon */
+  const icon=document.getElementById('icon');
+  icon.innerHTML='';
+  if(type==='night')drawIconNight(icon);
+  else if(type==='clear')drawIconClear(icon);
+  else if(type==='partly')drawIconPartly(icon);
+  else if(type==='cloudy'){drawIconCloudy(icon);}
+  else if(type==='rain'||type==='thunder')drawIconRain(icon);
+  else if(type==='snow')drawIconSnow(icon);
+  else if(type==='fog')drawIconFog(icon);
+  if(type==='thunder'){drawIconThunder(icon);}
+}
+
+/* ── fetch Worcester MA weather ── */
+/* Worcester MA: 42.2626, -71.8023 */
+fetch('https://api.open-meteo.com/v1/forecast?latitude=42.2626&longitude=-71.8023&current_weather=true&temperature_unit=fahrenheit')
+.then(r=>r.json()).then(d=>{
+  const c=d.current_weather;
+  document.getElementById('temp').textContent=Math.round(c.temperature)+'°F';
+  document.getElementById('desc').textContent=wcodes[c.weathercode]||'';
+  applyWeather(c.weathercode,c.is_day===0);
+}).catch(()=>{
+  document.getElementById('desc').textContent='weather unavailable';
+  applyWeather(2,false);
+});
 </script>
 </body>
 </html>
