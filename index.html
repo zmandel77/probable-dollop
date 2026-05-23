@@ -11,170 +11,81 @@
 :root{
   --font:'Courier Prime',monospace;
   --ink:#1a1a2e;
-  --muted:#6a7a8a;
   --border:rgba(255,255,255,0.28);
   --card:rgba(255,255,255,0.22);
   --card-hover:rgba(255,255,255,0.32);
   --radius:14px;
   --shadow:0 4px 24px rgba(0,0,0,0.10);
 }
-
 html{scroll-behavior:smooth;}
-body{
-  min-height:100vh;
-  font-family:var(--font);
-  color:var(--ink);
-  background:var(--grad,#a8c8e8);
-  transition:background 3s ease;
-}
+body{min-height:100vh;font-family:var(--font);color:var(--ink);background:var(--grad,#a8c8e8);transition:background 3s ease;}
 
-/* ── gradient engine ── */
-/* set via JS based on time of day */
-
-/* ── layout ── */
 .dashboard{
-  max-width:680px;
+  max-width:1200px;
   margin:0 auto;
-  padding:2rem 1.2rem 6rem;
-  display:flex;
-  flex-direction:column;
-  gap:1.4rem;
+  padding:1.5rem 1.2rem 4rem;
+  display:flex;flex-direction:column;gap:1.2rem;
+  position:relative;z-index:1;
 }
+.dash-grid{display:grid;grid-template-columns:3fr 2fr;gap:1.2rem;align-items:start;}
+@media(max-width:720px){.dash-grid{grid-template-columns:1fr;}}
+.dash-right{display:flex;flex-direction:column;gap:1.2rem;}
 
-/* ── card base ── */
-.card{
-  background:var(--card);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:1.4rem 1.6rem;
-  transition:background .2s;
-}
+.card{background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.4rem 1.6rem;transition:background .2s;}
 .card:hover{background:var(--card-hover);}
+.card-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:rgba(26,26,46,0.55);margin-bottom:.8rem;}
 
-.card-label{
-  font-size:10px;letter-spacing:.13em;text-transform:uppercase;
-  color:rgba(26,26,46,0.55);margin-bottom:.8rem;
-}
-
-/* ══════════════════════════════════════
-   § 1  WEATHER + CLOCK
-══════════════════════════════════════ */
-#scene{
-  position:fixed;inset:0;
-  pointer-events:none;z-index:0;
-  overflow:hidden;
-}
-.dashboard{position:relative;z-index:1;}
-
+/* §1 WEATHER + CLOCK */
+#scene{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
 .wc-grid{display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap;}
-.clock-block{}
 .clock-date{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(26,26,46,0.6);}
 .clock-time{font-size:52px;line-height:1;font-weight:700;}
 .clock-ampm{font-size:18px;font-weight:400;margin-left:4px;color:rgba(26,26,46,0.6);}
 .clock-loc{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,46,0.5);margin-top:2px;}
 .wc-divider{width:1px;height:60px;background:var(--border);flex-shrink:0;}
 .weather-block{display:flex;align-items:center;gap:.9rem;}
-#wx-icon{flex-shrink:0;}
 .wx-temp{font-size:32px;font-weight:700;display:block;}
 .wx-desc{font-size:12px;color:rgba(26,26,46,0.6);font-style:italic;margin-top:2px;}
 
-/* ══════════════════════════════════════
-   § 2  DAILY PLANNER
-══════════════════════════════════════ */
-.planner-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:1rem;
-}
+/* §2 DAILY PLANNER */
+.planner-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
 .planner-nav-title{font-size:14px;font-weight:700;}
 .planner-nav-arrows{display:flex;gap:.4rem;}
-.nav-btn{
-  font-family:var(--font);font-size:13px;
-  background:rgba(255,255,255,0.25);border:1px solid var(--border);
-  border-radius:6px;padding:3px 9px;cursor:pointer;color:var(--ink);
-  transition:background .15s;
-}
+.nav-btn{font-family:var(--font);font-size:13px;background:rgba(255,255,255,0.25);border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer;color:var(--ink);transition:background .15s;}
 .nav-btn:hover{background:rgba(255,255,255,0.4);}
-
-/* week strip */
-.week-strip{
-  display:flex;gap:.3rem;margin-bottom:1.2rem;overflow-x:auto;
-  padding-bottom:4px;
-}
+.week-strip{display:flex;gap:.3rem;margin-bottom:1.2rem;overflow-x:auto;padding-bottom:4px;}
 .week-strip::-webkit-scrollbar{height:3px;}
 .week-strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);border-radius:3px;}
-.week-day{
-  flex-shrink:0;width:44px;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:6px 4px;border-radius:10px;cursor:pointer;
-  border:1px solid transparent;transition:all .15s;
-}
+.week-day{flex-shrink:0;width:44px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:all .15s;}
 .week-day:hover{background:rgba(255,255,255,0.25);}
 .week-day.today{background:rgba(255,255,255,0.35);border-color:var(--border);}
 .week-day.has-event::after{content:'';width:5px;height:5px;border-radius:50%;background:rgba(26,26,46,0.4);display:block;}
 .wd-name{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.55);}
 .wd-num{font-size:15px;font-weight:700;}
 .wd-month{font-size:9px;color:rgba(26,26,46,0.45);}
-
-/* split: time blocks + task list */
 .planner-split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
 @media(max-width:480px){.planner-split{grid-template-columns:1fr;}}
-
 .planner-col-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,46,0.5);margin-bottom:.5rem;}
-
-/* time blocks */
 .time-blocks{display:flex;flex-direction:column;gap:.3rem;}
-.time-block{
-  display:flex;align-items:flex-start;gap:.6rem;
-  padding:.45rem .6rem;border-radius:8px;
-  background:rgba(255,255,255,0.18);
-  border:1px solid var(--border);
-  font-size:12px;
-  transition:background .15s;
-  position:relative;
-}
+.time-block{display:flex;align-items:flex-start;gap:.6rem;padding:.45rem .6rem;border-radius:8px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:12px;transition:background .15s;position:relative;}
 .time-block:hover{background:rgba(255,255,255,0.3);}
 .tb-time{font-size:10px;letter-spacing:.06em;color:rgba(26,26,46,0.55);white-space:nowrap;margin-top:1px;min-width:44px;}
 .tb-content{flex:1;}
 .tb-title{font-weight:700;font-size:12px;}
 .tb-sub{font-size:10px;color:rgba(26,26,46,0.55);font-style:italic;margin-top:1px;}
-.tb-tag{
-  font-size:9px;letter-spacing:.06em;text-transform:uppercase;
-  padding:1px 6px;border-radius:99px;margin-top:3px;display:inline-block;
-}
+.tb-tag{font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:99px;margin-top:3px;display:inline-block;}
 .tb-tag.exam{background:rgba(192,74,74,0.18);color:#8b3030;}
 .tb-tag.holiday{background:rgba(74,138,106,0.18);color:#2a6644;}
 .tb-tag.curriculum{background:rgba(74,127,165,0.18);color:#2a5a80;}
 .tb-tag.orientation{background:rgba(160,120,60,0.18);color:#7a5420;}
 .tb-tag.win{background:rgba(160,100,160,0.18);color:#6a3080;}
-.tb-now{
-  position:absolute;left:0;top:0;bottom:0;
-  width:3px;background:rgba(224,92,48,0.7);border-radius:3px 0 0 3px;
-}
-.add-block-btn{
-  font-family:var(--font);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
-  background:rgba(255,255,255,0.18);border:1px dashed rgba(255,255,255,0.4);
-  border-radius:8px;padding:6px;width:100%;cursor:pointer;color:rgba(26,26,46,0.5);
-  margin-top:.3rem;transition:all .15s;
-}
+.tb-now{position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(224,92,48,0.7);border-radius:3px 0 0 3px;}
+.add-block-btn{font-family:var(--font);font-size:11px;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.18);border:1px dashed rgba(255,255,255,0.4);border-radius:8px;padding:6px;width:100%;cursor:pointer;color:rgba(26,26,46,0.5);margin-top:.3rem;transition:all .15s;}
 .add-block-btn:hover{background:rgba(255,255,255,0.3);color:var(--ink);}
-
-/* quick tasks col */
 .task-list-mini{display:flex;flex-direction:column;gap:.3rem;}
-.task-mini{
-  display:flex;align-items:flex-start;gap:.5rem;
-  padding:.45rem .6rem;border-radius:8px;
-  background:rgba(255,255,255,0.18);border:1px solid var(--border);
-  font-size:12px;cursor:pointer;transition:background .15s;
-}
+.task-mini{display:flex;align-items:flex-start;gap:.5rem;padding:.45rem .6rem;border-radius:8px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:12px;transition:background .15s;}
 .task-mini:hover{background:rgba(255,255,255,0.3);}
-.task-mini-cb{
-  width:14px;height:14px;border-radius:4px;border:1.5px solid rgba(26,26,46,0.35);
-  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
-  transition:all .12s;
-}
+.task-mini-cb{width:14px;height:14px;border-radius:4px;border:1.5px solid rgba(26,26,46,0.35);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;}
 .task-mini-cb.done{background:rgba(26,26,46,0.5);border-color:transparent;}
 .task-mini-cb.done::after{content:'✓';font-size:8px;color:#fff;}
 .task-mini-text{flex:1;line-height:1.3;}
@@ -182,202 +93,52 @@ body{
 .task-mini-due{font-size:9px;color:rgba(26,26,46,0.5);white-space:nowrap;flex-shrink:0;}
 .task-mini-due.overdue{color:#c04a4a;}
 .no-tasks{font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.5rem;}
-.notion-sync-label{
-  font-size:10px;letter-spacing:.06em;color:rgba(26,26,46,0.4);
-  display:flex;align-items:center;gap:.35rem;margin-top:.5rem;
-}
+.notion-sync-label{font-size:10px;letter-spacing:.06em;color:rgba(26,26,46,0.4);display:flex;align-items:center;gap:.35rem;margin-top:.5rem;}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:#5a8f6a;animation:syncpulse 2s ease-in-out infinite;}
 @keyframes syncpulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-/* ══════════════════════════════════════
-   § 3  TO-DO
-══════════════════════════════════════ */
-.todo-input-row{display:flex;gap:.5rem;margin-bottom:.8rem;}
-.todo-input{
-  flex:1;font-family:var(--font);font-size:13px;
-  padding:.55rem .9rem;border-radius:10px;
-  border:1px solid var(--border);background:rgba(255,255,255,0.2);
-  backdrop-filter:blur(6px);color:var(--ink);outline:none;
-  transition:border-color .15s,box-shadow .15s;
-}
+/* §3 TO-DO */
+.todo-input-row{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;}
+.todo-input{flex:1;min-width:100px;font-family:var(--font);font-size:13px;padding:.55rem .9rem;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.2);backdrop-filter:blur(6px);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;}
 .todo-input::placeholder{color:rgba(26,26,46,0.4);font-style:italic;}
-.todo-input:focus{border-color:rgba(255,255,255,0.5);box-shadow:0 0 0 3px rgba(255,255,255,0.15);}
-.todo-add-btn{
-  font-family:var(--font);font-size:17px;
-  width:38px;height:38px;border-radius:10px;
-  border:1px solid var(--border);background:rgba(255,255,255,0.25);
-  color:var(--ink);cursor:pointer;transition:all .12s;
-  display:flex;align-items:center;justify-content:center;
-}
+.todo-input:focus,.todo-date:focus{border-color:rgba(255,255,255,0.5);box-shadow:0 0 0 3px rgba(255,255,255,0.15);}
+.todo-date{font-family:var(--font);font-size:12px;padding:.55rem .6rem;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.2);backdrop-filter:blur(6px);color:var(--ink);outline:none;cursor:pointer;color-scheme:light;}
+.todo-add-btn{font-family:var(--font);font-size:17px;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.25);color:var(--ink);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .todo-add-btn:hover{background:rgba(255,255,255,0.4);}
-
 .todo-items{display:flex;flex-direction:column;gap:.3rem;}
-.todo-item{
-  display:flex;align-items:center;gap:.6rem;
-  padding:.5rem .7rem;border-radius:9px;
-  background:rgba(255,255,255,0.18);border:1px solid var(--border);
-  font-size:13px;cursor:pointer;transition:all .15s;
-  animation:slideIn .18s ease;
-}
+.todo-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border-radius:9px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:13px;transition:all .15s;animation:slideIn .18s ease;}
 .todo-item:hover{background:rgba(255,255,255,0.3);}
 .todo-item.removing{opacity:0;transform:translateX(12px);}
 @keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-.todo-cb{
-  width:17px;height:17px;border-radius:5px;
-  border:1.5px solid rgba(26,26,46,0.3);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:all .12s;
-}
+.todo-cb{width:17px;height:17px;border-radius:5px;border:1.5px solid rgba(26,26,46,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .12s;}
 .todo-cb.done{background:rgba(26,26,46,0.45);border-color:transparent;}
 .todo-cb.done::after{content:'✓';font-size:9px;color:#fff;}
-.todo-text{flex:1;}
+.todo-text{flex:1;cursor:pointer;}
 .todo-text.done{text-decoration:line-through;opacity:0.5;}
-.todo-del{
-  font-size:11px;background:none;border:none;cursor:pointer;
-  color:rgba(26,26,46,0.3);padding:2px 4px;border-radius:4px;
-  opacity:0;transition:opacity .15s,color .15s;
-}
+.todo-due-badge{font-size:9px;color:rgba(26,26,46,0.5);white-space:nowrap;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.25);flex-shrink:0;}
+.todo-due-badge.overdue{color:#c04a4a;background:rgba(192,74,74,0.12);}
+.todo-gcal-btn{font-size:12px;text-decoration:none;background:none;border:none;cursor:pointer;opacity:0;transition:opacity .15s;flex-shrink:0;line-height:1;padding:2px;}
+.todo-item:hover .todo-gcal-btn{opacity:0.6;}
+.todo-gcal-btn:hover{opacity:1 !important;}
+.todo-del{font-size:11px;background:none;border:none;cursor:pointer;color:rgba(26,26,46,0.3);padding:2px 4px;border-radius:4px;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0;}
 .todo-item:hover .todo-del{opacity:1;}
 .todo-del:hover{color:#c04a4a;}
 .todo-empty{font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.5rem 0;}
-.todo-notion-bar{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-top:.7rem;padding-top:.6rem;
-  border-top:1px solid rgba(255,255,255,0.2);
-  font-size:10px;color:rgba(26,26,46,0.45);
-}
-.push-notion-btn{
-  font-family:var(--font);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
-  background:rgba(255,255,255,0.2);border:1px solid var(--border);
-  border-radius:6px;padding:3px 10px;cursor:pointer;color:rgba(26,26,46,0.6);
-  transition:all .15s;
-}
-.push-notion-btn:hover{background:rgba(255,255,255,0.35);color:var(--ink);}
+.todo-sync-bar{display:flex;align-items:center;gap:.4rem;margin-top:.6rem;padding-top:.5rem;border-top:1px solid rgba(255,255,255,0.2);font-size:10px;color:rgba(26,26,46,0.4);}
+.todo-sync-indicator{width:5px;height:5px;border-radius:50%;background:#5a8f6a;flex-shrink:0;transition:background .3s;}
+.todo-sync-indicator.syncing{background:#e09030;animation:syncpulse 0.7s ease-in-out infinite;}
+.todo-sync-indicator.error{background:#c04a4a;}
 
-/* ══════════════════════════════════════
-   § 4  NOTION CALENDAR EVENTS
-══════════════════════════════════════ */
+/* §4 CALENDAR EVENTS */
 .events-list{display:flex;flex-direction:column;gap:.4rem;}
-.event-item{
-  display:flex;align-items:flex-start;gap:.7rem;
-  padding:.55rem .7rem;border-radius:9px;
-  background:rgba(255,255,255,0.18);border:1px solid var(--border);
-}
-.event-date-badge{
-  flex-shrink:0;text-align:center;
-  min-width:36px;
-}
-.event-date-badge .edb-month{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.5);}
-.event-date-badge .edb-day{font-size:18px;font-weight:700;line-height:1;}
+.event-item{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem .7rem;border-radius:9px;background:rgba(255,255,255,0.18);border:1px solid var(--border);}
+.event-date-badge{flex-shrink:0;text-align:center;min-width:36px;}
+.edb-month{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.5);}
+.edb-day{font-size:18px;font-weight:700;line-height:1;}
 .event-body{flex:1;}
 .event-name{font-size:13px;font-weight:700;line-height:1.3;}
 .event-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.3rem;}
 .events-empty{font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.3rem 0;}
-
-/* ══════════════════════════════════════
-   § 5  VISTA ROADMAP
-══════════════════════════════════════ */
-.roadmap-wrap{
-  display:grid;
-  grid-template-columns:64px 2px 1fr;
-  gap:0 0;
-  position:relative;
-}
-.rm-date-col{grid-column:1;display:flex;flex-direction:column;}
-.rm-spine-col{grid-column:2;position:relative;}
-.rm-spine{
-  position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:linear-gradient(to bottom,#4a7fa5 0%,#4a7fa5 33%,#4e8c65 33%,#4e8c65 66%,#7a5a92 66%,#7a5a92 100%);
-  border-radius:2px;
-}
-.rm-items-col{grid-column:3;padding-left:14px;}
-
-/* date label cells — aligned to rows via JS-set min-height */
-.rm-date-cell{
-  display:flex;flex-direction:column;align-items:flex-end;
-  padding-right:10px;justify-content:flex-start;
-  min-height:var(--cell-h,36px);
-}
-.rm-date-month{
-  font-size:9px;letter-spacing:.08em;text-transform:uppercase;
-  color:rgba(26,26,46,0.55);font-style:italic;line-height:1.3;
-  text-align:right;margin-top:6px;white-space:nowrap;
-}
-
-.rm-phase{margin-bottom:1rem;}
-.rm-phase-header{
-  display:flex;align-items:center;gap:.6rem;
-  margin-bottom:.6rem;
-}
-.rm-phase-dot{
-  width:20px;height:20px;border-radius:50%;flex-shrink:0;
-  border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;
-  font-size:8px;font-weight:700;color:#fff;z-index:2;
-}
-.rm-phase-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a1a2e;}
-.rm-phase-sub{font-size:10px;color:rgba(26,26,46,0.55);font-style:italic;}
-
-.rm-item{
-  display:flex;align-items:flex-start;gap:.6rem;
-  margin-bottom:.4rem;
-  padding:.4rem .5rem .4rem 0;
-  border-radius:9px;cursor:pointer;transition:background .15s;
-}
-.rm-item:hover{background:rgba(255,255,255,0.2);}
-.rm-node{
-  width:13px;height:13px;border-radius:50%;flex-shrink:0;margin-top:3px;
-  border:2px solid currentColor;background:rgba(255,255,255,0.6);z-index:2;
-  display:flex;align-items:center;justify-content:center;transition:all .12s;
-}
-.rm-item.done .rm-node{background:currentColor;}
-.rm-item.done .rm-node::after{content:'';width:3px;height:6px;border-right:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(45deg) translate(-1px,-1px);display:block;}
-.rm-item-body{flex:1;}
-.rm-item-name{font-size:12.5px;font-weight:700;line-height:1.2;color:#1a1a2e;}
-.rm-item-desc{font-size:11px;color:rgba(26,26,46,0.55);font-style:italic;margin-top:1px;}
-.rm-item.done .rm-item-name{text-decoration:line-through;opacity:0.55;}
-
-.rm-cp{
-  display:flex;align-items:flex-start;gap:.6rem;
-  margin-bottom:.4rem;
-  padding:.4rem .5rem .4rem 0;
-  border-radius:9px;cursor:pointer;transition:background .15s;
-}
-.rm-cp:hover{background:rgba(255,255,255,0.2);}
-.rm-cp-node{
-  width:16px;height:16px;border-radius:4px;flex-shrink:0;margin-top:2px;
-  border:2px solid currentColor;background:rgba(255,255,255,0.6);z-index:2;
-  display:flex;align-items:center;justify-content:center;transition:all .12s;
-}
-.rm-cp.done .rm-cp-node{background:currentColor;}
-.rm-cp.done .rm-cp-node::after{content:'✓';font-size:8px;color:#fff;line-height:1;}
-.rm-cp-name{font-size:12.5px;font-weight:700;color:#1a1a2e;}
-.rm-cp-sub{font-size:11px;color:rgba(26,26,46,0.55);font-style:italic;margin-top:1px;}
-.rm-cp.done .rm-cp-name{text-decoration:line-through;opacity:0.55;}
-
-/* YOU ARE HERE */
-.yah-wrap{margin-bottom:.4rem;}
-.yah{
-  display:inline-flex;align-items:center;gap:.45rem;
-  background:rgba(224,92,48,0.85);color:#fff;
-  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  padding:5px 12px 5px 8px;border-radius:99px;
-  animation:yahpulse 2.5s ease-in-out infinite;
-  backdrop-filter:blur(4px);
-}
-.yah-dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.2s ease-in-out infinite;}
-@keyframes yahpulse{0%,100%{box-shadow:0 2px 12px rgba(224,92,48,0.4);}50%{box-shadow:0 2px 22px rgba(224,92,48,0.7);}}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.25;}}
-.yah-line{width:2px;height:18px;background:rgba(224,92,48,0.5);margin-left:8px;border-radius:2px;display:block;}
-
-/* roadmap progress bar */
-.rm-prog-wrap{margin-bottom:.8rem;}
-.rm-prog-label{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:rgba(26,26,46,0.5);margin-bottom:.3rem;}
-.rm-prog-track{height:4px;background:rgba(255,255,255,0.2);border-radius:99px;overflow:hidden;}
-.rm-prog-fill{height:100%;border-radius:99px;background:rgba(255,255,255,0.6);transition:width .5s;}
-
-/* ══════════════════════════════════════
-   WEATHER SCENE SVG helpers
-══════════════════════════════════════ */
 </style>
 </head>
 <body>
@@ -386,7 +147,7 @@ body{
 
 <div class="dashboard">
 
-  <!-- ── § 1 WEATHER + CLOCK ── -->
+  <!-- §1 WEATHER + CLOCK -->
   <div class="card" id="weather-card">
     <div class="wc-grid">
       <div class="clock-block">
@@ -405,86 +166,74 @@ body{
     </div>
   </div>
 
-  <!-- ── § 2 DAILY PLANNER ── -->
-  <div class="card">
-    <div class="card-label">daily planner</div>
-    <div class="planner-nav">
-      <div class="planner-nav-title" id="planner-title">Today</div>
-      <div class="planner-nav-arrows">
-        <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
-        <button class="nav-btn" onclick="shiftWeek(0)">today</button>
-        <button class="nav-btn" onclick="shiftWeek(1)">›</button>
+  <!-- 2-col grid -->
+  <div class="dash-grid">
+
+    <!-- LEFT: Daily Planner -->
+    <div class="card">
+      <div class="card-label">daily planner</div>
+      <div class="planner-nav">
+        <div class="planner-nav-title" id="planner-title">Today</div>
+        <div class="planner-nav-arrows">
+          <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
+          <button class="nav-btn" onclick="shiftWeek(0)">today</button>
+          <button class="nav-btn" onclick="shiftWeek(1)">›</button>
+        </div>
+      </div>
+      <div class="week-strip" id="week-strip"></div>
+      <div class="planner-split">
+        <div>
+          <div class="planner-col-label">time blocks</div>
+          <div class="time-blocks" id="time-blocks"></div>
+          <button class="add-block-btn" onclick="addTimeBlock()">+ add block</button>
+        </div>
+        <div>
+          <div class="planner-col-label">assignments due</div>
+          <div class="task-list-mini" id="notion-tasks-mini"></div>
+          <div class="notion-sync-label"><div class="sync-dot"></div>synced from notion</div>
+        </div>
       </div>
     </div>
-    <div class="week-strip" id="week-strip"></div>
-    <div class="planner-split">
-      <div>
-        <div class="planner-col-label">time blocks</div>
-        <div class="time-blocks" id="time-blocks"></div>
-        <button class="add-block-btn" onclick="addTimeBlock()">+ add block</button>
+
+    <!-- RIGHT col -->
+    <div class="dash-right">
+
+      <!-- To-do -->
+      <div class="card">
+        <div class="card-label">to-do</div>
+        <div class="todo-input-row">
+          <input class="todo-input" id="todo-input" type="text" placeholder="add a task..." maxlength="120">
+          <input class="todo-date" id="todo-date" type="date">
+          <button class="todo-add-btn" onclick="addTodo()">+</button>
+        </div>
+        <div class="todo-items" id="todo-items"></div>
+        <div class="todo-empty" id="todo-empty" style="display:none">nothing yet.</div>
+        <div class="todo-sync-bar">
+          <div class="todo-sync-indicator" id="sync-dot"></div>
+          <span id="todo-sync-status">synced to notion</span>
+        </div>
       </div>
-      <div>
-        <div class="planner-col-label">notion tasks due</div>
-        <div class="task-list-mini" id="notion-tasks-mini"></div>
-        <div class="notion-sync-label"><div class="sync-dot"></div>synced from notion</div>
+
+      <!-- Upcoming Events -->
+      <div class="card">
+        <div class="card-label">upcoming — academic calendar</div>
+        <div class="events-list" id="events-list"><div class="events-empty">loading events...</div></div>
+        <div class="notion-sync-label" style="margin-top:.5rem"><div class="sync-dot"></div>synced from 2026-2027 academic calendar</div>
       </div>
-    </div>
-  </div>
 
-  <!-- ── § 3 TO-DO ── -->
-  <div class="card">
-    <div class="card-label">to-do</div>
-    <div class="todo-input-row">
-      <input class="todo-input" id="todo-input" type="text" placeholder="add a task..." maxlength="120">
-      <button class="todo-add-btn" onclick="addTodo()">+</button>
-    </div>
-    <div class="todo-items" id="todo-items"></div>
-    <div class="todo-empty" id="todo-empty" style="display:none">nothing yet.</div>
-    <div class="todo-notion-bar">
-      <span id="todo-sync-status">local</span>
-      <button class="push-notion-btn" onclick="pushTodoToNotion()">push to notion</button>
-    </div>
-  </div>
-
-  <!-- ── § 4 NOTION CALENDAR EVENTS ── -->
-  <div class="card">
-    <div class="card-label">upcoming — notion academic calendar</div>
-    <div class="events-list" id="events-list"><div class="events-empty">loading events...</div></div>
-    <div class="notion-sync-label" style="margin-top:.5rem"><div class="sync-dot"></div>synced from 2026-2027 academic calendar</div>
-  </div>
-
-  <!-- ── § 5 VISTA ROADMAP ── -->
-  <div class="card">
-    <div class="card-label">vista roadmap — umass chan class of 2030</div>
-    <div class="rm-prog-wrap">
-      <div class="rm-prog-label"><span>overall progress</span><span id="rm-pct">0%</span></div>
-      <div class="rm-prog-track"><div class="rm-prog-fill" id="rm-fill" style="width:0%"></div></div>
-    </div>
-    <div class="roadmap-wrap">
-      <div class="rm-date-col" id="rm-date-col"></div>
-      <div class="rm-spine-col"><div class="rm-spine"></div></div>
-      <div class="rm-items-col" id="roadmap"></div>
     </div>
   </div>
 
 </div>
 
 <script>
-/* ═══════════════════════════════════════════
-   CONFIG
-═══════════════════════════════════════════ */
-const NOTION_TOKEN = 'ntn_b9621396454auHpstnIGoBQlq2gScDaXg3Bkq3oKIB9d6j';
-const TASKS_DB     = '48441ec6-e242-4d63-97d1-0f30ea524a05';
-const CALENDAR_DB  = '29123d7a-dbe6-80c9-ac72-d77d8f595a47';
-const NOTION_PAGE  = '35423d7adbe680a58a35d978c20c00f5';
-const NOTION_PROXY = 'https://api.allorigins.win/raw?url=';
+/* ── CONFIG ── */
+const ASSIGNMENTS_DB = '7a892195dc594a9e8e1057b22428669f';
+const CALENDAR_DB    = '29123d7a-dbe6-80c9-ac72-d77d8f595a47';
+const NOTION_PROXY   = 'https://api.allorigins.win/raw?url=';
 
-/* YOU ARE HERE — auto-advances as you check off items */
-
-/* ═══════════════════════════════════════════
-   GRADIENT ENGINE (time of day)
-═══════════════════════════════════════════ */
-const GRADIENTS = [
+/* ── GRADIENT ENGINE ── */
+const GRADIENTS=[
   {h:0,  grad:'linear-gradient(160deg,#0d1b3e 0%,#1a2a4a 50%,#2a3a5a 100%)'},
   {h:5,  grad:'linear-gradient(160deg,#1a1a3e 0%,#3a2a5a 40%,#6a4a6a 100%)'},
   {h:6,  grad:'linear-gradient(160deg,#c07050 0%,#e09060 40%,#f0c080 100%)'},
@@ -496,41 +245,26 @@ const GRADIENTS = [
   {h:21, grad:'linear-gradient(160deg,#2a1a3a 0%,#1a1a3a 50%,#0d1020 100%)'},
   {h:24, grad:'linear-gradient(160deg,#0d1b3e 0%,#1a2a4a 50%,#2a3a5a 100%)'},
 ];
-function getGradient(h){
-  for(let i=GRADIENTS.length-1;i>=0;i--){
-    if(h>=GRADIENTS[i].h) return GRADIENTS[i].grad;
-  }
-  return GRADIENTS[0].grad;
-}
-function updateGradient(){
-  const tz='America/New_York';
-  const h=parseInt(new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'numeric',hour12:false}).format(new Date()));
-  document.body.style.background = getGradient(h);
-}
-updateGradient();
-setInterval(updateGradient, 60000);
+function getGradient(h){for(let i=GRADIENTS.length-1;i>=0;i--){if(h>=GRADIENTS[i].h)return GRADIENTS[i].grad;}return GRADIENTS[0].grad;}
+function updateGradient(){const h=parseInt(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',hour12:false}).format(new Date()));document.body.style.background=getGradient(h);}
+updateGradient();setInterval(updateGradient,60000);
 
-/* ═══════════════════════════════════════════
-   CLOCK
-═══════════════════════════════════════════ */
+/* ── CLOCK ── */
 function tick(){
-  const tz='America/New_York', n=new Date();
+  const n=new Date(),tz='America/New_York';
   const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).formatToParts(n);
   const g=t=>p.find(x=>x.type===t)?.value||'';
   document.getElementById('cl-date').textContent=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'long',month:'long',day:'numeric',year:'numeric'}).format(n);
   document.getElementById('cl-time').childNodes[0].nodeValue=g('hour')+':'+g('minute')+':'+g('second');
   document.getElementById('cl-ampm').textContent=g('dayperiod').toLowerCase();
 }
-tick(); setInterval(tick,1000);
+tick();setInterval(tick,1000);
 
-/* ═══════════════════════════════════════════
-   WEATHER
-═══════════════════════════════════════════ */
+/* ── WEATHER ── */
 const NS='http://www.w3.org/2000/svg';
 function svgEl(tag,a){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);return e;}
 function svgAnim(e,attr,vals,dur,delay){const a=svgEl('animate',{attributeName:attr,values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',calcMode:'easeInOut'});e.appendChild(a);return e;}
-function svgTA(e,vals,dur,delay){const a=svgEl('animateTransform',{attributeName:'transform',type:'translate',values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',additive:'sum'});e.appendChild(a);return e;}
-
+function svgTA(e,vals,dur){const a=svgEl('animateTransform',{attributeName:'transform',type:'translate',values:vals,dur:dur+'s',begin:'0s',repeatCount:'indefinite',additive:'sum'});e.appendChild(a);}
 function wxCloud(svg,cx,cy,op){
   const g=svgEl('g',{opacity:op});
   g.appendChild(svgEl('ellipse',{cx,cy,rx:13,ry:8,fill:'#2e2c2c'}));
@@ -539,64 +273,41 @@ function wxCloud(svg,cx,cy,op){
   svgTA(g,'0,0;3,0;0,0',5);svg.appendChild(g);
 }
 const WX_CODES={0:'clear',1:'mainly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'rain',71:'snow',73:'snow',75:'snow',80:'showers',81:'showers',82:'showers',95:'thunderstorm',96:'thunderstorm',99:'thunderstorm'};
-
-function drawWxIcon(svg,code,isNight){
-  svg.innerHTML='';
-  const type=wxType(code,isNight);
-  if(type==='night'){
-    const o=svgEl('circle',{cx:32,cy:30,r:12,fill:'#2e2c2c',opacity:'0.9'});
-    const i=svgEl('circle',{cx:37,cy:25,r:10,fill:'rgba(255,255,255,0.3)'});
-    svgAnim(o,'opacity','0.9;0.7;0.9',4,0); svg.appendChild(o);svg.appendChild(i);
-    [[12,12,1],[10,26,1.8],[18,44,0.7]].forEach(([x,y,d])=>{const s=svgEl('circle',{cx:x,cy:y,r:1,fill:'#5a5656'});svgAnim(s,'opacity','0;0.8;0',2.5,d);svg.appendChild(s);});
-  } else if(type==='clear'){
-    const sun=svgEl('circle',{cx:30,cy:30,r:10,fill:'#2e2c2c',opacity:'0.88'});
-    svgAnim(sun,'r','10;12;10',4,0);svg.appendChild(sun);
-    [0,45,90,135,180,225,270,315].forEach(a=>{const r=a*Math.PI/180,ray=svgEl('line',{x1:30+14*Math.cos(r),y1:30+14*Math.sin(r),x2:30+19*Math.cos(r),y2:30+19*Math.sin(r),stroke:'#5a5656','stroke-width':'1.3','stroke-linecap':'round'});svgAnim(ray,'opacity','0.7;0.2;0.7',4,a/360*4);svg.appendChild(ray);});
-  } else if(type==='partly'){
-    const sun=svgEl('circle',{cx:20,cy:22,r:8,fill:'#5a5656',opacity:'0.65'});svgAnim(sun,'cy','22;20;22',3,0);svg.appendChild(sun);
-    wxCloud(svg,34,38,1);
-  } else if(type==='cloudy'){
-    wxCloud(svg,30,32,0.4);wxCloud(svg,30,40,1);
-  } else if(type==='rain'){
-    wxCloud(svg,30,34,1);
-    [[22,48,0],[30,52,0.4],[38,48,0.8],[26,56,1.2]].forEach(([x,y,d])=>{
-      const ln=svgEl('line',{x1:x,y1:y,x2:x-3,y2:y+6,stroke:'#5a5656','stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});
-      svgAnim(ln,'opacity','0;0.8;0',1.2,d);svg.appendChild(ln);
-    });
-  } else if(type==='snow'){
-    wxCloud(svg,30,34,1);
-    [[22,48,0],[30,52,0.6],[38,48,1.1]].forEach(([x,y,d])=>{
-      const g=svgEl('g');[0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(svgEl('line',{x1:x-4*Math.cos(r),y1:y-4*Math.sin(r),x2:x+4*Math.cos(r),y2:y+4*Math.sin(r),stroke:'#5a5656','stroke-width':'1','stroke-linecap':'round'}));});
-      svgAnim(g,'opacity','0;0.9;0',2,d);svg.appendChild(g);
-    });
-  } else if(type==='fog'){
-    [[6,22,48,0],[6,30,40,0.4],[6,38,46,0.8],[6,46,32,1.2]].forEach(([x,y,w,d])=>{
-      const ln=svgEl('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:'#5a5656','stroke-width':'1.4','stroke-linecap':'round',opacity:'0.5'});
-      svgAnim(ln,'opacity','0.5;0.15;0.5',3,d);svg.appendChild(ln);
-    });
-  } else if(type==='thunder'){
-    wxCloud(svg,30,32,1);
-    [[22,46,0],[30,50,0.4],[38,46,0.8]].forEach(([x,y,d])=>{const ln=svgEl('line',{x1:x,y1:y,x2:x-3,y2:y+6,stroke:'#5a5656','stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});svgAnim(ln,'opacity','0;0.8;0',1.2,d);svg.appendChild(ln);});
-    const bolt=svgEl('polygon',{points:'34,16 27,30 33,30 25,48 40,26 33,26 39,16',fill:'#2e2c2c',opacity:'0'});
-    const ba=svgEl('animate',{attributeName:'opacity',values:'0;0;0;1;0.8;0;0;0;1;0',dur:'3.5s',repeatCount:'indefinite'});bolt.appendChild(ba);svg.appendChild(bolt);
-  }
-}
-
 function wxType(code,isNight){
   if(isNight&&code<=1)return'night';
-  if(code<=1)return'clear'; if(code===2)return'partly'; if(code===3)return'cloudy';
+  if(code<=1)return'clear';if(code===2)return'partly';if(code===3)return'cloudy';
   if(code===45||code===48)return'fog';
-  if(code>=51&&code<=55)return'rain'; if(code>=61&&code<=65)return'rain';
-  if(code>=71&&code<=75)return'snow'; if(code>=80&&code<=82)return'rain';
-  if(code>=95)return'thunder'; return'cloudy';
+  if(code>=51&&code<=65)return'rain';if(code>=71&&code<=75)return'snow';
+  if(code>=80&&code<=82)return'rain';if(code>=95)return'thunder';return'cloudy';
 }
-
-/* big scene */
+function drawWxIcon(svg,code,isNight){
+  svg.innerHTML='';const type=wxType(code,isNight);
+  if(type==='night'){
+    const o=svgEl('circle',{cx:32,cy:30,r:12,fill:'#2e2c2c',opacity:'0.9'});svgAnim(o,'opacity','0.9;0.7;0.9',4,0);svg.appendChild(o);
+    svg.appendChild(svgEl('circle',{cx:37,cy:25,r:10,fill:'rgba(255,255,255,0.3)'}));
+  }else if(type==='clear'){
+    const sun=svgEl('circle',{cx:30,cy:30,r:10,fill:'#2e2c2c',opacity:'0.88'});svgAnim(sun,'r','10;12;10',4,0);svg.appendChild(sun);
+    [0,45,90,135,180,225,270,315].forEach(a=>{const r=a*Math.PI/180;const ray=svgEl('line',{x1:30+14*Math.cos(r),y1:30+14*Math.sin(r),x2:30+19*Math.cos(r),y2:30+19*Math.sin(r),stroke:'#5a5656','stroke-width':'1.3','stroke-linecap':'round'});svgAnim(ray,'opacity','0.7;0.2;0.7',4,a/360*4);svg.appendChild(ray);});
+  }else if(type==='partly'){
+    const sun=svgEl('circle',{cx:20,cy:22,r:8,fill:'#5a5656',opacity:'0.65'});svgAnim(sun,'cy','22;20;22',3,0);svg.appendChild(sun);wxCloud(svg,34,38,1);
+  }else if(type==='cloudy'){wxCloud(svg,30,32,0.4);wxCloud(svg,30,40,1);
+  }else if(type==='rain'){
+    wxCloud(svg,30,34,1);
+    [[22,48,0],[30,52,0.4],[38,48,0.8],[26,56,1.2]].forEach(([x,y,d])=>{const ln=svgEl('line',{x1:x,y1:y,x2:x-3,y2:y+6,stroke:'#5a5656','stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});svgAnim(ln,'opacity','0;0.8;0',1.2,d);svg.appendChild(ln);});
+  }else if(type==='snow'){
+    wxCloud(svg,30,34,1);
+    [[22,48,0],[30,52,0.6],[38,48,1.1]].forEach(([x,y,d])=>{const g=svgEl('g');[0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(svgEl('line',{x1:x-4*Math.cos(r),y1:y-4*Math.sin(r),x2:x+4*Math.cos(r),y2:y+4*Math.sin(r),stroke:'#5a5656','stroke-width':'1','stroke-linecap':'round'}));});svgAnim(g,'opacity','0;0.9;0',2,d);svg.appendChild(g);});
+  }else if(type==='fog'){
+    [[6,22,48,0],[6,30,40,0.4],[6,38,46,0.8],[6,46,32,1.2]].forEach(([x,y,w,d])=>{const ln=svgEl('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:'#5a5656','stroke-width':'1.4','stroke-linecap':'round',opacity:'0.5'});svgAnim(ln,'opacity','0.5;0.15;0.5',3,d);svg.appendChild(ln);});
+  }else if(type==='thunder'){
+    wxCloud(svg,30,32,1);[[22,46,0],[30,50,0.4],[38,46,0.8]].forEach(([x,y,d])=>{const ln=svgEl('line',{x1:x,y1:y,x2:x-3,y2:y+6,stroke:'#5a5656','stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});svgAnim(ln,'opacity','0;0.8;0',1.2,d);svg.appendChild(ln);});
+    const bolt=svgEl('polygon',{points:'34,16 27,30 33,30 25,48 40,26 33,26 39,16',fill:'#2e2c2c',opacity:'0'});svgAnim(bolt,'opacity','0;0;0;1;0.8;0;0;0;1;0',3.5,0);svg.appendChild(bolt);
+  }
+}
 function buildWxScene(code,isNight){
-  const scene=document.getElementById('scene'); scene.innerHTML='';
+  const scene=document.getElementById('scene');scene.innerHTML='';
   const type=wxType(code,isNight);
-  const W=1000,H=600;
-  function scCloud(x,y,sc,op,spd,delay){
+  function scCloud(y,op,spd,delay){
     const g=svgEl('g',{opacity:op});
     g.appendChild(svgEl('ellipse',{cx:0,cy:0,rx:55,ry:28,fill:'#2e2c2c'}));
     g.appendChild(svgEl('ellipse',{cx:-40,cy:10,rx:35,ry:22,fill:'#2e2c2c'}));
@@ -605,68 +316,24 @@ function buildWxScene(code,isNight){
     g.appendChild(a);scene.appendChild(g);
   }
   if(type==='clear'){
-    const g=svgEl('g',{opacity:'0.1'});
-    const sun=svgEl('circle',{cx:860,cy:80,r:100,fill:'#2e2c2c'});svgAnim(sun,'r','100;110;100',6,0);g.appendChild(sun);
-    [0,30,60,90,120,150,180,210,240,270,300,330].forEach(a=>{const r=a*Math.PI/180;const ray=svgEl('line',{x1:860+120*Math.cos(r),y1:80+120*Math.sin(r),x2:860+160*Math.cos(r),y2:80+160*Math.sin(r),stroke:'#2e2c2c','stroke-width':'3','stroke-linecap':'round'});svgAnim(ray,'opacity','0.8;0.2;0.8',5,a/360*5);g.appendChild(ray);});
-    scene.appendChild(g);
-    scCloud(-200,100,1,0.06,65,5); scCloud(-200,340,1,0.04,85,25);
-  } else if(type==='partly'){
-    const g=svgEl('g',{opacity:'0.1'});
-    scene.appendChild(g); scCloud(-200,80,1,0.07,60,0); scCloud(-200,320,1,0.05,80,20);
-  } else if(type==='cloudy'){
-    scCloud(-200,50,1.2,0.08,55,0);scCloud(-200,190,0.9,0.06,72,12);
-    scCloud(-200,350,1.0,0.07,65,28);scCloud(-200,470,0.7,0.05,90,5);
-  } else if(type==='rain'){
-    scCloud(-200,50,1.2,0.08,55,0);scCloud(-200,200,0.9,0.06,70,15);scCloud(-200,380,1.0,0.07,65,30);
-    for(let i=0;i<40;i++){
-      const x=Math.random()*1000,y=Math.random()*600;
-      const d=svgEl('line',{x1:x,y1:y,x2:x-5,y2:y+16,stroke:'#5a5656','stroke-width':'0.7',opacity:'0'});
-      const dur=0.8+Math.random()*0.5,dl=Math.random()*dur;
-      svgAnim(d,'opacity','0;0.35;0',dur,dl);
-      const mv=svgEl('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;-8,24',dur:dur+'s',begin:dl+'s',repeatCount:'indefinite',additive:'sum',calcMode:'linear'});
-      d.appendChild(mv);scene.appendChild(d);
-    }
-  } else if(type==='snow'){
-    scCloud(-200,50,1.2,0.08,55,0);scCloud(-200,200,0.9,0.06,70,15);scCloud(-200,380,1.0,0.07,65,30);
-    for(let i=0;i<30;i++){
-      const x=Math.random()*1000,y=Math.random()*600;
-      const g=svgEl('g',{opacity:'0'});
-      [0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(svgEl('line',{x1:x-5*Math.cos(r),y1:y-5*Math.sin(r),x2:x+5*Math.cos(r),y2:y+5*Math.sin(r),stroke:'#8a8686','stroke-width':'0.9','stroke-linecap':'round'}));});
-      const dur=2+Math.random()*2,dl=Math.random()*dur;
-      svgAnim(g,'opacity','0;0.4;0',dur,dl);
-      const mv=svgEl('animateTransform',{attributeName:'transform',type:'translate',values:`0,0;${Math.random()*16-8},${25+Math.random()*15}`,dur:dur+'s',begin:dl+'s',repeatCount:'indefinite',additive:'sum'});
-      g.appendChild(mv);scene.appendChild(g);
-    }
-  } else if(type==='fog'){
-    for(let i=0;i<8;i++){
-      const y=40+i*68,w=200+Math.random()*400,x=Math.random()*500;
-      const ln=svgEl('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:'#5a5656','stroke-width':'16','stroke-linecap':'round',opacity:'0'});
-      const dur=4+Math.random()*4,dl=Math.random()*dur;
-      svgAnim(ln,'opacity','0;0.07;0',dur,dl);scene.appendChild(ln);
-    }
-  } else if(type==='thunder'){
-    scCloud(-200,50,1.2,0.08,55,0);scCloud(-200,200,0.9,0.06,70,15);scCloud(-200,380,1.0,0.07,65,30);
-    for(let i=0;i<35;i++){
-      const x=Math.random()*1000,y=Math.random()*600;
-      const d=svgEl('line',{x1:x,y1:y,x2:x-5,y2:y+16,stroke:'#5a5656','stroke-width':'0.7',opacity:'0'});
-      const dur=0.8+Math.random()*0.5,dl=Math.random()*dur;
-      svgAnim(d,'opacity','0;0.35;0',dur,dl);scene.appendChild(d);
-    }
-    [200,500,800].forEach((bx,i)=>{
-      const bolt=svgEl('polygon',{points:`${bx},20 ${bx-25},140 ${bx-8},140 ${bx-42},300 ${bx+35},120 ${bx+8},120 ${bx+42},20`,fill:'#2e2c2c',opacity:'0'});
-      const a=svgEl('animate',{attributeName:'opacity',values:'0;0;0;0.15;0.1;0;0;0;0.12;0',dur:(6+i*2)+'s',begin:(i*2)+'s',repeatCount:'indefinite'});bolt.appendChild(a);scene.appendChild(bolt);
-    });
-  } else if(type==='night'){
-    const g=svgEl('g',{opacity:'0.1'});
-    const o=svgEl('circle',{cx:820,cy:90,r:70,fill:'#2e2c2c'});svgAnim(o,'opacity','1;0.75;1',5,0);
-    g.appendChild(o);g.appendChild(svgEl('circle',{cx:848,cy:65,r:58,fill:'rgba(255,255,255,0.15)'}));scene.appendChild(g);
-    for(let i=0;i<60;i++){
-      const s=svgEl('circle',{cx:Math.random()*1000,cy:Math.random()*450,r:0.7+Math.random()*1.1,fill:'#2e2c2c',opacity:'0'});
-      const dur=2+Math.random()*4,dl=Math.random()*dur;svgAnim(s,'opacity','0;0.2;0',dur,dl);scene.appendChild(s);
-    }
+    const g=svgEl('g',{opacity:'0.1'});const sun=svgEl('circle',{cx:860,cy:80,r:100,fill:'#2e2c2c'});svgAnim(sun,'r','100;110;100',6,0);g.appendChild(sun);scene.appendChild(g);
+    scCloud(100,0.06,65,5);scCloud(340,0.04,85,25);
+  }else if(type==='partly'){scCloud(80,0.07,60,0);scCloud(320,0.05,80,20);
+  }else if(type==='cloudy'){scCloud(50,0.08,55,0);scCloud(190,0.06,72,12);scCloud(350,0.07,65,28);scCloud(470,0.05,90,5);
+  }else if(type==='rain'||type==='thunder'){
+    scCloud(50,0.08,55,0);scCloud(200,0.06,70,15);scCloud(380,0.07,65,30);
+    for(let i=0;i<40;i++){const x=Math.random()*1000,y=Math.random()*600;const d=svgEl('line',{x1:x,y1:y,x2:x-5,y2:y+16,stroke:'#5a5656','stroke-width':'0.7',opacity:'0'});const dur=0.8+Math.random()*0.5,dl=Math.random()*dur;svgAnim(d,'opacity','0;0.35;0',dur,dl);scene.appendChild(d);}
+    if(type==='thunder'){[200,500,800].forEach((bx,i)=>{const bolt=svgEl('polygon',{points:`${bx},20 ${bx-25},140 ${bx-8},140 ${bx-42},300 ${bx+35},120 ${bx+8},120 ${bx+42},20`,fill:'#2e2c2c',opacity:'0'});const a=svgEl('animate',{attributeName:'opacity',values:'0;0;0;0.15;0.1;0;0;0;0.12;0',dur:(6+i*2)+'s',begin:(i*2)+'s',repeatCount:'indefinite'});bolt.appendChild(a);scene.appendChild(bolt);});}
+  }else if(type==='snow'){
+    scCloud(50,0.08,55,0);scCloud(200,0.06,70,15);scCloud(380,0.07,65,30);
+    for(let i=0;i<30;i++){const x=Math.random()*1000,y=Math.random()*600;const g=svgEl('g',{opacity:'0'});[0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(svgEl('line',{x1:x-5*Math.cos(r),y1:y-5*Math.sin(r),x2:x+5*Math.cos(r),y2:y+5*Math.sin(r),stroke:'#8a8686','stroke-width':'0.9','stroke-linecap':'round'}));});const dur=2+Math.random()*2,dl=Math.random()*dur;svgAnim(g,'opacity','0;0.4;0',dur,dl);scene.appendChild(g);}
+  }else if(type==='fog'){
+    for(let i=0;i<8;i++){const y=40+i*68,w=200+Math.random()*400,x=Math.random()*500;const ln=svgEl('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:'#5a5656','stroke-width':'16','stroke-linecap':'round',opacity:'0'});const dur=4+Math.random()*4,dl=Math.random()*dur;svgAnim(ln,'opacity','0;0.07;0',dur,dl);scene.appendChild(ln);}
+  }else if(type==='night'){
+    const g=svgEl('g',{opacity:'0.1'});const o=svgEl('circle',{cx:820,cy:90,r:70,fill:'#2e2c2c'});svgAnim(o,'opacity','1;0.75;1',5,0);g.appendChild(o);g.appendChild(svgEl('circle',{cx:848,cy:65,r:58,fill:'rgba(255,255,255,0.15)'}));scene.appendChild(g);
+    for(let i=0;i<60;i++){const s=svgEl('circle',{cx:Math.random()*1000,cy:Math.random()*450,r:0.7+Math.random()*1.1,fill:'#2e2c2c',opacity:'0'});const dur=2+Math.random()*4,dl=Math.random()*dur;svgAnim(s,'opacity','0;0.2;0',dur,dl);scene.appendChild(s);}
   }
 }
-
 fetch('https://api.open-meteo.com/v1/forecast?latitude=42.2626&longitude=-71.8023&current_weather=true&temperature_unit=fahrenheit')
 .then(r=>r.json()).then(d=>{
   const c=d.current_weather;
@@ -676,461 +343,219 @@ fetch('https://api.open-meteo.com/v1/forecast?latitude=42.2626&longitude=-71.802
   buildWxScene(c.weathercode,c.is_day===0);
 }).catch(()=>{document.getElementById('wx-desc').textContent='unavailable';});
 
-/* ═══════════════════════════════════════════
-   NOTION API HELPER
-═══════════════════════════════════════════ */
-async function notionAPI(endpoint, method='GET', body=null){
-  const url = NOTION_PROXY + encodeURIComponent('https://api.notion.com/v1/'+endpoint);
-  const opts = {
-    method,
-    headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
-  };
-  if(body) opts.body = JSON.stringify(body);
-  const r = await fetch(url, opts);
+/* ── NOTION API ── */
+async function notionAPI(endpoint,method='GET',body=null){
+  const url=NOTION_PROXY+encodeURIComponent('https://api.notion.com/v1/'+endpoint);
+  const opts={method,headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);
   return r.json();
 }
 
-/* ═══════════════════════════════════════════
-   WEEK STRIP + PLANNER STATE
-═══════════════════════════════════════════ */
+/* ── PLANNER STATE ── */
 const TZ='America/New_York';
-let plannerWeekOffset=0;
-let selectedDate=getTodayET();
-let calendarEvents=[]; /* from Notion */
-let notionTasks=[];    /* from Notion */
+let plannerWeekOffset=0,selectedDate=getTodayET(),calendarEvents=[],notionTasks=[];
 
-function getTodayET(){
-  return new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date()); /* YYYY-MM-DD */
-}
-function addDays(dateStr,n){
-  const d=new Date(dateStr+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10);
-}
-function fmtMonthDay(dateStr){
-  const d=new Date(dateStr+'T12:00:00Z');
-  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-}
-function fmtWeekday(dateStr){
-  return new Date(dateStr+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'short'}).toUpperCase();
-}
-function fmtDay(dateStr){ return new Date(dateStr+'T12:00:00Z').getUTCDate(); }
-function fmtMonth(dateStr){ return new Date(dateStr+'T12:00:00Z').toLocaleDateString('en-US',{month:'short'}); }
+function getTodayET(){return new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date());}
+function addDays(s,n){const d=new Date(s+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
+function fmtMonthDay(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function fmtWeekday(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'short'}).toUpperCase();}
+function fmtDay(s){return new Date(s+'T12:00:00Z').getUTCDate();}
+function fmtMonth(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short'});}
 
 function shiftWeek(dir){
-  if(dir===0){plannerWeekOffset=0;selectedDate=getTodayET();}
-  else plannerWeekOffset+=dir;
+  if(dir===0){plannerWeekOffset=0;selectedDate=getTodayET();}else plannerWeekOffset+=dir;
   renderWeekStrip();
 }
-
 function renderWeekStrip(){
-  const today=getTodayET();
-  const baseDate=addDays(today, plannerWeekOffset*7);
-  /* find monday of that week */
-  const d=new Date(baseDate+'T12:00:00Z');
-  const dow=d.getUTCDay(); /* 0=sun */
-  const mondayDate=addDays(baseDate, dow===0?-6:1-dow);
-
-  const strip=document.getElementById('week-strip');
-  strip.innerHTML='';
+  const today=getTodayET(),base=addDays(today,plannerWeekOffset*7);
+  const dow=new Date(base+'T12:00:00Z').getUTCDay();
+  const mon=addDays(base,dow===0?-6:1-dow);
+  const strip=document.getElementById('week-strip');strip.innerHTML='';
   for(let i=0;i<7;i++){
-    const date=addDays(mondayDate,i);
+    const date=addDays(mon,i);
     const div=document.createElement('div');
     div.className='week-day'+(date===today?' today':'');
-    const hasEv=calendarEvents.some(e=>e.date===date);
-    if(hasEv) div.classList.add('has-event');
+    if(calendarEvents.some(e=>e.date===date))div.classList.add('has-event');
     div.innerHTML=`<div class="wd-name">${fmtWeekday(date)}</div><div class="wd-num">${fmtDay(date)}</div><div class="wd-month">${fmtMonth(date)}</div>`;
-    div.onclick=()=>{selectedDate=date;renderTimeBlocks();renderNotionTasksMini();};
-    if(date===selectedDate) div.style.background='rgba(255,255,255,0.4)';
+    div.onclick=()=>{selectedDate=date;renderTimeBlocks();renderNotionTasksMini();renderWeekStrip();};
+    if(date===selectedDate)div.style.background='rgba(255,255,255,0.4)';
     strip.appendChild(div);
   }
-  const selDate=new Date(selectedDate+'T12:00:00Z');
-  document.getElementById('planner-title').textContent=
-    selDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('planner-title').textContent=new Date(selectedDate+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
 }
 
-/* ═══════════════════════════════════════════
-   TIME BLOCKS (local storage)
-═══════════════════════════════════════════ */
+/* ── TIME BLOCKS ── */
 const TB_STORE='wc_timeblocks_v1';
 let timeBlocks={};
 function loadTB(){try{const d=localStorage.getItem(TB_STORE);if(d)timeBlocks=JSON.parse(d);}catch(e){}}
 function saveTB(){localStorage.setItem(TB_STORE,JSON.stringify(timeBlocks));}
-
 function renderTimeBlocks(){
-  const wrap=document.getElementById('time-blocks');
-  const blocks=(timeBlocks[selectedDate]||[]);
-  /* also show Notion calendar events for this day */
+  const wrap=document.getElementById('time-blocks'),blocks=timeBlocks[selectedDate]||[];
   const evts=calendarEvents.filter(e=>e.date===selectedDate);
   wrap.innerHTML='';
   const nowH=parseInt(new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(new Date()));
-
-  /* merge events + manual blocks */
-  const all=[
-    ...evts.map(e=>({time:'',title:e.name,sub:'',tag:e.tag,isNotion:true})),
-    ...blocks
-  ];
-  if(all.length===0){
-    wrap.innerHTML='<div style="font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.3rem 0">no blocks yet.</div>';
-    return;
-  }
+  const all=[...evts.map(e=>({time:'',title:e.name,sub:'',tag:e.tag,isNotion:true})),...blocks];
+  if(!all.length){wrap.innerHTML='<div style="font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.3rem 0">no blocks yet.</div>';return;}
   all.forEach(b=>{
-    const div=document.createElement('div');
-    div.className='time-block';
+    const div=document.createElement('div');div.className='time-block';
     const isNow=b.time&&parseInt(b.time)===nowH;
-    div.innerHTML=`
-      ${isNow?'<div class="tb-now"></div>':''}
-      <div class="tb-time">${b.time||'—'}</div>
-      <div class="tb-content">
-        <div class="tb-title">${b.title}</div>
-        ${b.sub?`<div class="tb-sub">${b.sub}</div>`:''}
-        ${b.tag?`<span class="tb-tag ${b.tag.toLowerCase()}">${b.tag}</span>`:''}
-      </div>
-      ${!b.isNotion?`<button onclick="deleteBlock('${selectedDate}',${blocks.indexOf(b)})" style="background:none;border:none;cursor:pointer;font-size:11px;color:rgba(26,26,46,0.3);opacity:0;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">✕</button>`:''}
-    `;
+    div.innerHTML=`${isNow?'<div class="tb-now"></div>':''}<div class="tb-time">${b.time||'—'}</div><div class="tb-content"><div class="tb-title">${b.title}</div>${b.sub?`<div class="tb-sub">${b.sub}</div>`:''}${b.tag?`<span class="tb-tag ${b.tag.toLowerCase()}">${b.tag}</span>`:''}</div>${!b.isNotion?`<button onclick="deleteBlock('${selectedDate}',${blocks.indexOf(b)})" style="background:none;border:none;cursor:pointer;font-size:11px;color:rgba(26,26,46,0.3);opacity:0;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">✕</button>`:''}`;
     wrap.appendChild(div);
   });
 }
-
-function deleteBlock(date,idx){
-  if(timeBlocks[date]) timeBlocks[date].splice(idx,1);
-  saveTB();renderTimeBlocks();
-}
-
+function deleteBlock(date,idx){if(timeBlocks[date])timeBlocks[date].splice(idx,1);saveTB();renderTimeBlocks();}
 function addTimeBlock(){
-  const time=prompt('Time? (e.g. 9am, 2pm)','');
-  if(time===null)return;
-  const title=prompt('What? (e.g. Anki review)','');
-  if(!title)return;
+  const time=prompt('Time? (e.g. 9am, 2pm)','');if(time===null)return;
+  const title=prompt('What? (e.g. Anki review)','');if(!title)return;
   const sub=prompt('Notes? (optional)','');
-  if(!timeBlocks[selectedDate]) timeBlocks[selectedDate]=[];
+  if(!timeBlocks[selectedDate])timeBlocks[selectedDate]=[];
   timeBlocks[selectedDate].push({time,title,sub:sub||''});
   saveTB();renderTimeBlocks();
 }
 
-/* ═══════════════════════════════════════════
-   NOTION TASKS (mini view in planner)
-═══════════════════════════════════════════ */
+/* ── NOTION TASKS (Assignments DB) ── */
 function renderNotionTasksMini(){
-  const wrap=document.getElementById('notion-tasks-mini');
-  wrap.innerHTML='';
+  const wrap=document.getElementById('notion-tasks-mini');wrap.innerHTML='';
   const today=getTodayET();
-  /* show tasks due on selectedDate or overdue */
-  const filtered=notionTasks.filter(t=>{
-    if(!t.due) return selectedDate===today; /* undated tasks show today */
-    return t.due<=selectedDate;
-  }).slice(0,6);
-  if(filtered.length===0){
-    wrap.innerHTML='<div class="no-tasks">all clear.</div>';return;
-  }
+  const filtered=notionTasks.filter(t=>t.due?t.due<=selectedDate:selectedDate===today).slice(0,7);
+  if(!filtered.length){wrap.innerHTML='<div class="no-tasks">all clear.</div>';return;}
   filtered.forEach(t=>{
-    const div=document.createElement('div');
-    div.className='task-mini';
+    const div=document.createElement('div');div.className='task-mini';
     const overdue=t.due&&t.due<today;
-    div.innerHTML=`
-      <div class="task-mini-cb${t.done?' done':''}"></div>
-      <div class="task-mini-text${t.done?' done':''}">${t.name}</div>
-      ${t.due?`<div class="task-mini-due${overdue?' overdue':''}">${fmtMonthDay(t.due)}</div>`:''}
-    `;
+    div.innerHTML=`<div class="task-mini-cb${t.done?' done':''}"></div><div class="task-mini-text${t.done?' done':''}">${t.name}</div>${t.due?`<div class="task-mini-due${overdue?' overdue':''}">${fmtMonthDay(t.due)}</div>`:''}`;
     wrap.appendChild(div);
   });
 }
-
 async function fetchNotionTasks(){
   try{
-    const data=await notionAPI('databases/'+TASKS_DB+'/query','POST',{
-      page_size:20,
-      sorts:[{property:'Due',direction:'ascending'}]
+    const data=await notionAPI('databases/'+ASSIGNMENTS_DB+'/query','POST',{
+      page_size:30,
+      filter:{property:'Status',status:{does_not_equal:'Done'}},
+      sorts:[{property:'Due Date',direction:'ascending'}]
     });
     if(data.results){
       notionTasks=data.results.map(p=>{
         const props=p.properties;
-        const name=props['Task name']?.title?.[0]?.plain_text||props['Name']?.title?.[0]?.plain_text||'Untitled';
-        const due=props['Due']?.date?.start||null;
-        const status=props['Status']?.status?.name||'';
-        const done=status==='Done'||status==='Complete';
-        return{id:p.id,name,due,done,status};
+        return{
+          id:p.id,
+          name:props['Name']?.title?.[0]?.plain_text||'Untitled',
+          due:props['Due Date']?.date?.start?.slice(0,10)||null,
+          done:props['Status']?.status?.name==='Done',
+          type:props['Type']?.select?.name||''
+        };
       });
     }
   }catch(e){console.warn('Notion tasks fetch failed',e);}
   renderNotionTasksMini();
 }
 
-/* ═══════════════════════════════════════════
-   NOTION CALENDAR EVENTS
-═══════════════════════════════════════════ */
+/* ── CALENDAR EVENTS ── */
 async function fetchCalendarEvents(){
   try{
-    const today=getTodayET();
     const data=await notionAPI('databases/'+CALENDAR_DB+'/query','POST',{
       page_size:20,
-      filter:{property:'Date',date:{on_or_after:today}},
+      filter:{property:'Date',date:{on_or_after:getTodayET()}},
       sorts:[{property:'Date',direction:'ascending'}]
     });
     if(data.results){
       calendarEvents=data.results.map(p=>{
         const props=p.properties;
-        const name=props['Name']?.title?.[0]?.plain_text||'Event';
-        const date=props['Date']?.date?.start?.slice(0,10)||null;
         const tags=props['Tags']?.multi_select?.map(t=>t.name)||[];
-        const tag=tags[0]||'';
-        return{id:p.id,name,date,tag,tags};
+        return{id:p.id,name:props['Name']?.title?.[0]?.plain_text||'Event',date:props['Date']?.date?.start?.slice(0,10)||null,tag:tags[0]||'',tags};
       }).filter(e=>e.date);
     }
   }catch(e){console.warn('Calendar fetch failed',e);}
-  renderCalendarEvents();
-  renderWeekStrip();
-  renderTimeBlocks();
+  renderCalendarEvents();renderWeekStrip();renderTimeBlocks();
 }
-
 function renderCalendarEvents(){
-  const wrap=document.getElementById('events-list');
-  wrap.innerHTML='';
-  if(calendarEvents.length===0){
-    wrap.innerHTML='<div class="events-empty">no upcoming events found.</div>';return;
-  }
+  const wrap=document.getElementById('events-list');wrap.innerHTML='';
+  if(!calendarEvents.length){wrap.innerHTML='<div class="events-empty">no upcoming events found.</div>';return;}
   calendarEvents.slice(0,8).forEach(e=>{
-    const div=document.createElement('div');
-    div.className='event-item';
-    const tagClass=e.tag.toLowerCase().replace(/[^a-z]/g,'');
-    div.innerHTML=`
-      <div class="event-date-badge">
-        <div class="edb-month">${e.date?fmtMonth(e.date):''}</div>
-        <div class="edb-day">${e.date?fmtDay(e.date):'?'}</div>
-      </div>
-      <div class="event-body">
-        <div class="event-name">${e.name}</div>
-        <div class="event-tags">
-          ${e.tags.map(t=>`<span class="tb-tag ${t.toLowerCase().replace(/[/& ]/g,'').substring(0,10)}">${t}</span>`).join('')}
-        </div>
-      </div>
-    `;
+    const div=document.createElement('div');div.className='event-item';
+    div.innerHTML=`<div class="event-date-badge"><div class="edb-month">${fmtMonth(e.date)}</div><div class="edb-day">${fmtDay(e.date)}</div></div><div class="event-body"><div class="event-name">${e.name}</div><div class="event-tags">${e.tags.map(t=>`<span class="tb-tag ${t.toLowerCase().replace(/[^a-z]/g,'').slice(0,10)}">${t}</span>`).join('')}</div></div>`;
     wrap.appendChild(div);
   });
 }
 
-/* ═══════════════════════════════════════════
-   TO-DO (local + push to Notion)
-═══════════════════════════════════════════ */
+/* ── TO-DO (auto-syncs to Notion Assignments DB) ── */
 const TODO_STORE='wc_todo_v2';
 let todos=[];
 function loadTodos(){try{const d=localStorage.getItem(TODO_STORE);if(d)todos=JSON.parse(d);}catch(e){}}
 function saveTodos(){localStorage.setItem(TODO_STORE,JSON.stringify(todos));}
 
+function setSyncStatus(state,msg){
+  document.getElementById('sync-dot').className='todo-sync-indicator'+(state==='syncing'?' syncing':state==='error'?' error':'');
+  document.getElementById('todo-sync-status').textContent=msg;
+}
+
+function gcalUrl(text,date){
+  const d=date.replace(/-/g,'');
+  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(text)}&dates=${d}/${d}&details=${encodeURIComponent('Added via Worcester Dashboard')}`;
+}
+
 function renderTodos(){
-  const wrap=document.getElementById('todo-items');
-  const empty=document.getElementById('todo-empty');
+  const wrap=document.getElementById('todo-items'),empty=document.getElementById('todo-empty');
   wrap.innerHTML='';
-  if(todos.length===0){empty.style.display='block';return;}
+  if(!todos.length){empty.style.display='block';return;}
   empty.style.display='none';
+  const today=getTodayET();
   todos.forEach(t=>{
-    const div=document.createElement('div');
-    div.className='todo-item';
-    div.dataset.id=t.id;
+    const div=document.createElement('div');div.className='todo-item';div.dataset.id=t.id;
+    const overdue=t.due&&t.due<today&&!t.done;
     div.innerHTML=`
       <div class="todo-cb${t.done?' done':''}"></div>
       <div class="todo-text${t.done?' done':''}">${t.text}</div>
-      <button class="todo-del">✕</button>
+      ${t.due?`<span class="todo-due-badge${overdue?' overdue':''}">${fmtMonthDay(t.due)}</span>`:''}
+      ${t.due&&!t.done?`<a class="todo-gcal-btn" href="${gcalUrl(t.text,t.due)}" target="_blank" rel="noopener" title="Add to Google Calendar">📅</a>`:''}
+      <button class="todo-del" title="Delete">✕</button>
     `;
     div.querySelector('.todo-cb').onclick=()=>{t.done=!t.done;saveTodos();renderTodos();};
     div.querySelector('.todo-text').onclick=()=>{t.done=!t.done;saveTodos();renderTodos();};
-    div.querySelector('.todo-del').onclick=(e)=>{
-      e.stopPropagation();
-      div.classList.add('removing');
+    div.querySelector('.todo-del').onclick=e=>{
+      e.stopPropagation();div.classList.add('removing');
       setTimeout(()=>{todos=todos.filter(x=>x.id!==t.id);saveTodos();renderTodos();},200);
     };
     wrap.appendChild(div);
   });
 }
 
-function addTodo(){
-  const inp=document.getElementById('todo-input');
-  const text=inp.value.trim();
-  if(!text)return;
-  todos.unshift({id:Date.now(),text,done:false});
-  inp.value='';saveTodos();renderTodos();
+async function pushTaskToNotion(task){
+  const props={
+    'Name':{title:[{text:{content:task.text}}]},
+    'Status':{status:{name:'Not started'}},
+    'Type':{select:{name:'Assignment'}}
+  };
+  if(task.due)props['Due Date']={date:{start:task.due}};
+  const result=await notionAPI('pages','POST',{parent:{database_id:ASSIGNMENTS_DB},properties:props});
+  return result.id||null;
 }
 
-async function pushTodoToNotion(){
-  const undone=todos.filter(t=>!t.done);
-  if(undone.length===0){alert('No pending tasks to push.');return;}
-  document.getElementById('todo-sync-status').textContent='pushing...';
+async function addTodo(){
+  const inp=document.getElementById('todo-input'),dateInp=document.getElementById('todo-date');
+  const text=inp.value.trim();if(!text)return;
+  const due=dateInp.value||null;
+  const task={id:Date.now(),text,due,done:false,notionId:null};
+  todos.unshift(task);inp.value='';dateInp.value='';
+  saveTodos();renderTodos();
+  setSyncStatus('syncing','syncing...');
   try{
-    for(const t of undone){
-      await notionAPI('pages','POST',{
-        parent:{database_id:TASKS_DB},
-        properties:{
-          'Task name':{title:[{text:{content:t.text}}]},
-          'Status':{status:{name:'Not started'}}
-        }
-      });
-    }
-    document.getElementById('todo-sync-status').textContent='pushed ✓';
-    setTimeout(()=>{document.getElementById('todo-sync-status').textContent='local';fetchNotionTasks();},2000);
+    task.notionId=await pushTaskToNotion(task);
+    saveTodos();
+    setSyncStatus('ok','synced to notion ✓');
+    setTimeout(()=>{setSyncStatus('ok','synced to notion');fetchNotionTasks();},2500);
   }catch(e){
-    document.getElementById('todo-sync-status').textContent='push failed';
-    console.error(e);
+    setSyncStatus('error','sync failed');
+    console.warn('Notion push failed',e);
   }
 }
 
 document.getElementById('todo-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
+document.getElementById('todo-date').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
 
-/* ═══════════════════════════════════════════
-   VISTA ROADMAP
-═══════════════════════════════════════════ */
-const RM_STORE='vista_rm_v2';
-let rmState={};
-function loadRM(){try{const d=localStorage.getItem(RM_STORE);if(d)rmState=JSON.parse(d);}catch(e){}}
-function saveRM(){localStorage.setItem(RM_STORE,JSON.stringify(rmState));}
-function rmDone(id){return!!rmState[id];}
-function rmToggle(id){rmState[id]=!rmState[id];saveRM();}
-
-const ROADMAP=[
-  {type:'phase',id:'p1',color:'#4a7fa5',title:'① Discovery',sub:'Foundations of Medicine · Aug 2026 – Spring 2028',month:'Aug 2026'},
-  {type:'cp',id:'wcc',color:'#e05c30',name:'White Coat Ceremony',sub:'Sept 11, 2026',month:'Sep 2026'},
-  {type:'item',id:'m1',color:'#4a7fa5',name:'FOM1 — Molecules, Cells & Genes',desc:'Cell biology, DNA, genetics, metabolism, intro pharmacology',month:'Aug 2026'},
-  {type:'item',id:'m2',color:'#4a7fa5',name:'FOM1 — Tissues & Immunity',desc:'Histology, innate/adaptive immunity, inflammation, microbiology basics',month:'Sep 2026'},
-  {type:'item',id:'m3',color:'#4a7fa5',name:'FOM1 — Cardiopulmonary',desc:'Cardiac & pulmonary anatomy, hemodynamics, ECG basics',month:'Oct 2026'},
-  {type:'item',id:'m4',color:'#4a7fa5',name:'FOM1 — Renal, Endocrine & Repro',desc:'Nephron physiology, hormonal axes, glucose regulation',month:'Nov 2026'},
-  {type:'item',id:'m5',color:'#4a7fa5',name:'FOM1 — Neuroscience & MSK',desc:'Neuroanatomy, cranial nerves, neurotransmission, muscle & bone',month:'Dec 2026'},
-  {type:'item',id:'m6',color:'#4a7fa5',name:'FOM1 — GI, Hepatic & Hematology',desc:'GI motility, liver function, hematopoiesis, coagulation',month:'Jan 2027'},
-  {type:'cp',id:'c1',color:'#c07040',name:'End-of-FOM1 Assessment',sub:'Foundational science shelf · promotion to FOM2',month:'Feb 2027'},
-  {type:'item',id:'m7',color:'#4a7fa5',name:'FOM2 — Cardiopulmonary Pathophysiology',desc:'ACS, heart failure, arrhythmias, asthma, COPD, pneumonia',month:'Mar 2027'},
-  {type:'item',id:'m8',color:'#4a7fa5',name:'FOM2 — Renal, Endocrine & Repro Pathophysiology',desc:'CKD, thyroid/adrenal disorders, DM, OB/GYN oncology',month:'Apr 2027'},
-  {type:'item',id:'m9',color:'#4a7fa5',name:'FOM2 — Neuro, Psych & MSK Pathophysiology',desc:'Stroke, neurodegeneration, seizures, psychiatric pharmacology',month:'May 2027'},
-  {type:'item',id:'m10',color:'#4a7fa5',name:'FOM2 — GI, Heme & Oncology Pathophysiology',desc:'IBD, liver disease, hematologic malignancies, cancer biology',month:'Jun 2027'},
-  {type:'item',id:'m11',color:'#4a7fa5',name:'"Patients" — Integration & Step 1 Prep',desc:'Integrated vignettes, NBMEs, UWorld, Step 1 strategy',month:'Fall 2027'},
-  {type:'cp',id:'c2',color:'#c04a4a',name:'USMLE Step 1',sub:'Required prior to beginning Exploration Phase',month:'Jan 2028'},
-  {type:'cp',id:'c3',color:'#4a7fa5',name:'Transition to Core Clinical Experiences',sub:'2-week simulation & orientation bridge',month:'Feb 2028'},
-  {type:'phase',id:'p2',color:'#4e8c65',title:'② Exploration',sub:'Core Clinical Clerkships · 2028–2029',month:'Feb 2028'},
-  {type:'item',id:'m12',color:'#4e8c65',name:'Internal Medicine Clerkship',desc:'H&P, inpatient management, evidence-based medicine, rounds',month:'Mar 2028'},
-  {type:'cp',id:'cx1',color:'#c07040',name:'IM Shelf Exam',sub:'End of clerkship shelf',month:'Apr 2028'},
-  {type:'item',id:'m13',color:'#4e8c65',name:'Surgery Clerkship',desc:'OR technique, acute abdomen, trauma basics, surgical ethics',month:'May 2028'},
-  {type:'cp',id:'cx2',color:'#c07040',name:'Surgery Shelf Exam',sub:'End of clerkship shelf',month:'Jun 2028'},
-  {type:'item',id:'m14',color:'#4e8c65',name:'Pediatrics Clerkship',desc:'Developmental milestones, well-child visits, peds emergencies',month:'Jul 2028'},
-  {type:'cp',id:'cx3',color:'#c07040',name:'Pediatrics Shelf Exam',sub:'End of clerkship shelf',month:'Aug 2028'},
-  {type:'item',id:'m15',color:'#4e8c65',name:'OB/GYN Clerkship',desc:'Labor & delivery, obstetric complications, gynecologic oncology',month:'Sep 2028'},
-  {type:'cp',id:'cx4',color:'#c07040',name:'OB/GYN Shelf Exam',sub:'End of clerkship shelf',month:'Oct 2028'},
-  {type:'item',id:'m16',color:'#4e8c65',name:'Psychiatry Clerkship',desc:'Mental status exam, DSM-5, suicide risk, psychopharmacology',month:'Nov 2028'},
-  {type:'cp',id:'cx5',color:'#c07040',name:'Psychiatry Shelf Exam',sub:'End of clerkship shelf',month:'Dec 2028'},
-  {type:'item',id:'m17',color:'#4e8c65',name:'Neurology Clerkship',desc:'Neuro exam, stroke protocols, epilepsy, LP interpretation',month:'Jan 2029'},
-  {type:'cp',id:'cx6',color:'#c07040',name:'Neurology Shelf Exam',sub:'End of clerkship shelf',month:'Feb 2029'},
-  {type:'item',id:'m18',color:'#4e8c65',name:'Family Medicine & Ambulatory Care',desc:'Preventive care, chronic disease, health equity, SDOH',month:'Mar 2029'},
-  {type:'cp',id:'c4',color:'#c04a4a',name:'USMLE Step 2 CK',sub:'Clinical knowledge examination',month:'Apr 2029'},
-  {type:'phase',id:'p3',color:'#7a5a92',title:'③ Horizons',sub:'Advanced Studies · 2029–2030',month:'May 2029'},
-  {type:'item',id:'m19',color:'#7a5a92',name:'Sub-Internship (Acting Internship)',desc:'Full intern-level patient load, cross-cover, procedural independence',month:'May 2029'},
-  {type:'item',id:'m20',color:'#7a5a92',name:'Emergency CPS — Critical Care',desc:'ACLS, high-acuity cases, ICU management, procedural simulation',month:'Jul 2029'},
-  {type:'item',id:'m21',color:'#7a5a92',name:'Advanced Biomedical & Translational Sciences',desc:'Clinical trial appraisal, biostatistics, genomic medicine',month:'Sep 2029'},
-  {type:'item',id:'m22',color:'#7a5a92',name:'Electives & Away Rotations',desc:'Target specialty exposure, letters of rec, personal statement',month:'Oct 2029'},
-  {type:'cp',id:'c5',color:'#7a5a92',name:'Capstone / Pathways Presentation',sub:'Public longitudinal project defense',month:'Nov 2029'},
-  {type:'cp',id:'c6',color:'#7a5a92',name:'ERAS Application & Interview Season',sub:'Residency applications, program interviews, rank list',month:'Sep 2029'},
-  {type:'cp',id:'c7',color:'#e05c30',name:'Match Day 🎉',sub:'The finish line.',month:'Mar 2030'},
-];
-
-/* YAH auto-advances to sit just before the first unchecked item/cp */
-function getYAHAfter(){
-  for(let i=0;i<ROADMAP.length;i++){
-    const item=ROADMAP[i];
-    if((item.type==='item'||item.type==='cp')&&!rmDone(item.id)){
-      return i===0?null:ROADMAP[i-1].id;
-    }
-  }
-  return ROADMAP[ROADMAP.length-1].id;
-}
-
-function buildRoadmap(){
-  loadRM();
-  const itemsCol=document.getElementById('roadmap');
-  const dateCol=document.getElementById('rm-date-col');
-  itemsCol.innerHTML='';dateCol.innerHTML='';
-
-  const yahAfter=getYAHAfter();
-  let yahInserted=false;
-  let lastMonth='';
-
-  ROADMAP.forEach((item,idx)=>{
-    /* insert YAH after whichever item is yahAfter */
-    if(!yahInserted && yahAfter!==null && idx>0 && ROADMAP[idx-1].id===yahAfter){
-      dateCol.appendChild(Object.assign(document.createElement('div'),{className:'rm-date-cell'}));
-      const yah=document.createElement('div');
-      yah.className='yah-wrap';
-      yah.innerHTML=`<div class="yah"><div class="yah-dot"></div>you are here</div><div class="yah-line"></div>`;
-      itemsCol.appendChild(yah);
-      yahInserted=true;
-    }
-    /* insert YAH at very top if nothing done yet */
-    if(!yahInserted && yahAfter===null && idx===0){
-      dateCol.appendChild(Object.assign(document.createElement('div'),{className:'rm-date-cell'}));
-      const yah=document.createElement('div');
-      yah.className='yah-wrap';
-      yah.innerHTML=`<div class="yah"><div class="yah-dot"></div>you are here</div><div class="yah-line"></div>`;
-      itemsCol.appendChild(yah);
-      yahInserted=true;
-    }
-
-    /* date cell — show month only when it changes */
-    const dc=document.createElement('div');
-    dc.className='rm-date-cell';
-    if(item.month&&item.month!==lastMonth){
-      lastMonth=item.month;
-      dc.innerHTML=`<div class="rm-date-month">${item.month}</div>`;
-    }
-    dateCol.appendChild(dc);
-
-    if(item.type==='phase'){
-      const div=document.createElement('div');
-      div.className='rm-phase';div.id='rmrow-'+item.id;
-      div.innerHTML=`<div class="rm-phase-header"><div class="rm-phase-dot" style="background:${item.color};box-shadow:0 0 0 2.5px ${item.color}"></div><div><div class="rm-phase-title" style="color:${item.color}">${item.title}</div><div class="rm-phase-sub">${item.sub}</div></div></div>`;
-      itemsCol.appendChild(div);
-    } else if(item.type==='item'){
-      const done=rmDone(item.id);
-      const div=document.createElement('div');
-      div.className='rm-item'+(done?' done':'');div.id='rmrow-'+item.id;div.style.color=item.color;
-      div.innerHTML=`<div class="rm-node" style="color:${item.color}"></div><div class="rm-item-body"><div class="rm-item-name">${item.name}</div><div class="rm-item-desc">${item.desc}</div></div>`;
-      div.onclick=()=>{rmToggle(item.id);buildRoadmap();};
-      itemsCol.appendChild(div);
-    } else if(item.type==='cp'){
-      const done=rmDone(item.id);
-      const div=document.createElement('div');
-      div.className='rm-cp'+(done?' done':'');div.id='rmrow-'+item.id;div.style.color=item.color;
-      div.innerHTML=`<div class="rm-cp-node" style="color:${item.color}"></div><div><div class="rm-cp-name">${item.name}</div><div class="rm-cp-sub">${item.sub}</div></div>`;
-      div.onclick=()=>{rmToggle(item.id);buildRoadmap();};
-      itemsCol.appendChild(div);
-    }
-  });
-
-  /* if everything is done, YAH at the bottom */
-  if(!yahInserted){
-    dateCol.appendChild(Object.assign(document.createElement('div'),{className:'rm-date-cell'}));
-    const yah=document.createElement('div');yah.className='yah-wrap';
-    yah.innerHTML=`<div class="yah"><div class="yah-dot"></div>you are here</div>`;
-    itemsCol.appendChild(yah);
-  }
-
-  /* align date cell heights to their corresponding item rows */
-  requestAnimationFrame(()=>{
-    const dateCells=Array.from(dateCol.querySelectorAll('.rm-date-cell'));
-    const itemRows=Array.from(itemsCol.children).filter(r=>!r.classList.contains('yah-wrap'));
-    itemRows.forEach((row,i)=>{
-      if(dateCells[i]) dateCells[i].style.minHeight=row.getBoundingClientRect().height+'px';
-    });
-  });
-
-  updateRMProgress();
-}
-
-function updateRMProgress(){
-  const items=ROADMAP.filter(x=>x.type==='item'||x.type==='cp');
-  const done=items.filter(x=>rmDone(x.id)).length;
-  const pct=items.length?Math.round(done/items.length*100):0;
-  document.getElementById('rm-pct').textContent=pct+'%';
-  document.getElementById('rm-fill').style.width=pct+'%';
-}
-
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
-loadTB(); loadTodos(); renderTodos();
-buildRoadmap();
-renderWeekStrip(); renderTimeBlocks();
+/* ── INIT ── */
+loadTB();loadTodos();renderTodos();
+renderWeekStrip();renderTimeBlocks();
 fetchNotionTasks();
 fetchCalendarEvents();
 </script>
