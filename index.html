@@ -97,47 +97,38 @@ body{min-height:100vh;font-family:var(--font);color:var(--ink);background:var(--
 .sync-dot{width:6px;height:6px;border-radius:50%;background:#5a8f6a;animation:syncpulse 2s ease-in-out infinite;}
 @keyframes syncpulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-/* §3 TO-DO */
-.todo-input-row{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;}
-.todo-input{flex:1;min-width:100px;font-family:var(--font);font-size:13px;padding:.55rem .9rem;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.2);backdrop-filter:blur(6px);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;}
-.todo-input::placeholder{color:rgba(26,26,46,0.4);font-style:italic;}
-.todo-input:focus,.todo-date:focus{border-color:rgba(255,255,255,0.5);box-shadow:0 0 0 3px rgba(255,255,255,0.15);}
-.todo-date{font-family:var(--font);font-size:12px;padding:.55rem .6rem;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.2);backdrop-filter:blur(6px);color:var(--ink);outline:none;cursor:pointer;color-scheme:light;}
-.todo-add-btn{font-family:var(--font);font-size:17px;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,0.25);color:var(--ink);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.todo-add-btn:hover{background:rgba(255,255,255,0.4);}
-.todo-items{display:flex;flex-direction:column;gap:.3rem;}
-.todo-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border-radius:9px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:13px;transition:all .15s;animation:slideIn .18s ease;}
-.todo-item:hover{background:rgba(255,255,255,0.3);}
-.todo-item.removing{opacity:0;transform:translateX(12px);}
-@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-.todo-cb{width:17px;height:17px;border-radius:5px;border:1.5px solid rgba(26,26,46,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .12s;}
-.todo-cb.done{background:rgba(26,26,46,0.45);border-color:transparent;}
-.todo-cb.done::after{content:'✓';font-size:9px;color:#fff;}
-.todo-text{flex:1;cursor:pointer;}
-.todo-text.done{text-decoration:line-through;opacity:0.5;}
-.todo-due-badge{font-size:9px;color:rgba(26,26,46,0.5);white-space:nowrap;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.25);flex-shrink:0;}
-.todo-due-badge.overdue{color:#c04a4a;background:rgba(192,74,74,0.12);}
-.todo-gcal-btn{font-size:12px;text-decoration:none;background:none;border:none;cursor:pointer;opacity:0;transition:opacity .15s;flex-shrink:0;line-height:1;padding:2px;}
-.todo-item:hover .todo-gcal-btn{opacity:0.6;}
-.todo-gcal-btn:hover{opacity:1 !important;}
-.todo-del{font-size:11px;background:none;border:none;cursor:pointer;color:rgba(26,26,46,0.3);padding:2px 4px;border-radius:4px;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0;}
-.todo-item:hover .todo-del{opacity:1;}
-.todo-del:hover{color:#c04a4a;}
-.todo-empty{font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.5rem 0;}
-.todo-sync-bar{display:flex;align-items:center;gap:.4rem;margin-top:.6rem;padding-top:.5rem;border-top:1px solid rgba(255,255,255,0.2);font-size:10px;color:rgba(26,26,46,0.4);}
-.todo-sync-indicator{width:5px;height:5px;border-radius:50%;background:#5a8f6a;flex-shrink:0;transition:background .3s;}
-.todo-sync-indicator.syncing{background:#e09030;animation:syncpulse 0.7s ease-in-out infinite;}
-.todo-sync-indicator.error{background:#c04a4a;}
+/* §3 MONTH CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+.cal-month-title{font-size:14px;font-weight:700;letter-spacing:.01em;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:.8rem;}
+.cal-day-hdr{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:rgba(26,26,46,0.4);text-align:center;padding:0 0 5px;}
+.cal-day{min-height:38px;border-radius:7px;padding:4px 3px 3px;display:flex;flex-direction:column;align-items:center;cursor:default;transition:background .12s;}
+.cal-day.other-month .cal-day-num{opacity:.3;}
+.cal-day.today{background:rgba(255,255,255,0.38);border:1px solid var(--border);}
+.cal-day.has-event{cursor:pointer;}
+.cal-day.has-event:hover{background:rgba(255,255,255,0.28);}
+.cal-day.exam-day{background:rgba(192,74,74,0.13);}
+.cal-day.exam-day.today{background:rgba(192,74,74,0.22);}
+.cal-day-num{font-size:11px;font-weight:700;line-height:1.3;}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:3px;}
+.cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+/* selected day event panel */
+.cal-selected-events{display:none;margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,0.2);}
+.cal-selected-events.visible{display:block;}
+.cal-sel-title{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.45);margin-bottom:.4rem;}
+.cal-sel-item{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:8px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:12px;margin-bottom:.3rem;}
+.cal-sel-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.cal-sel-name{flex:1;font-weight:700;line-height:1.3;}
 
-/* §4 CALENDAR EVENTS */
-.events-list{display:flex;flex-direction:column;gap:.4rem;}
-.event-item{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem .7rem;border-radius:9px;background:rgba(255,255,255,0.18);border:1px solid var(--border);}
-.event-date-badge{flex-shrink:0;text-align:center;min-width:36px;}
+/* §4 UPCOMING EVENTS */
+.events-list{display:flex;flex-direction:column;gap:.35rem;}
+.event-item{display:flex;align-items:flex-start;gap:.7rem;padding:.5rem .65rem;border-radius:9px;background:rgba(255,255,255,0.18);border:1px solid var(--border);}
+.event-date-badge{flex-shrink:0;text-align:center;min-width:32px;}
 .edb-month{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.5);}
-.edb-day{font-size:18px;font-weight:700;line-height:1;}
+.edb-day{font-size:17px;font-weight:700;line-height:1;}
 .event-body{flex:1;}
-.event-name{font-size:13px;font-weight:700;line-height:1.3;}
-.event-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.3rem;}
+.event-name{font-size:12px;font-weight:700;line-height:1.3;}
+.event-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.25rem;}
 .events-empty{font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.3rem 0;}
 </style>
 </head>
@@ -198,27 +189,26 @@ body{min-height:100vh;font-family:var(--font);color:var(--ink);background:var(--
     <!-- RIGHT col -->
     <div class="dash-right">
 
-      <!-- To-do -->
+      <!-- Monthly Calendar -->
       <div class="card">
-        <div class="card-label">to-do</div>
-        <div class="todo-input-row">
-          <input class="todo-input" id="todo-input" type="text" placeholder="add a task..." maxlength="120">
-          <input class="todo-date" id="todo-date" type="date">
-          <button class="todo-add-btn" onclick="addTodo()">+</button>
+        <div class="card-label">academic calendar</div>
+        <div class="cal-nav">
+          <button class="nav-btn" onclick="shiftMonth(-1)">‹</button>
+          <span class="cal-month-title" id="cal-month-title">—</span>
+          <button class="nav-btn" onclick="shiftMonth(1)">›</button>
         </div>
-        <div class="todo-items" id="todo-items"></div>
-        <div class="todo-empty" id="todo-empty" style="display:none">nothing yet.</div>
-        <div class="todo-sync-bar">
-          <div class="todo-sync-indicator" id="sync-dot"></div>
-          <span id="todo-sync-status">synced to notion</span>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-selected-events" id="cal-selected-events">
+          <div class="cal-sel-title" id="cal-sel-title"></div>
+          <div id="cal-sel-list"></div>
         </div>
+        <div class="notion-sync-label" style="margin-top:.5rem"><div class="sync-dot"></div>synced from notion</div>
       </div>
 
       <!-- Upcoming Events -->
       <div class="card">
-        <div class="card-label">upcoming — academic calendar</div>
+        <div class="card-label">upcoming</div>
         <div class="events-list" id="events-list"><div class="events-empty">loading events...</div></div>
-        <div class="notion-sync-label" style="margin-top:.5rem"><div class="sync-dot"></div>synced from 2026-2027 academic calendar</div>
       </div>
 
     </div>
@@ -460,107 +450,149 @@ async function fetchNotionTasks(){
 async function fetchCalendarEvents(){
   try{
     const data=await notionAPI('databases/'+CALENDAR_DB+'/query','POST',{
-      page_size:20,
-      filter:{property:'Date',date:{on_or_after:getTodayET()}},
+      page_size:100,
       sorts:[{property:'Date',direction:'ascending'}]
     });
     if(data.results){
       calendarEvents=data.results.map(p=>{
         const props=p.properties;
         const tags=props['Tags']?.multi_select?.map(t=>t.name)||[];
-        return{id:p.id,name:props['Name']?.title?.[0]?.plain_text||'Event',date:props['Date']?.date?.start?.slice(0,10)||null,tag:tags[0]||'',tags};
+        return{
+          id:p.id,
+          name:props['Name']?.title?.[0]?.plain_text||'Event',
+          date:props['Date']?.date?.start?.slice(0,10)||null,
+          endDate:props['Date']?.date?.end?.slice(0,10)||null,
+          tag:tags[0]||'',tags
+        };
       }).filter(e=>e.date);
     }
   }catch(e){console.warn('Calendar fetch failed',e);}
-  renderCalendarEvents();renderWeekStrip();renderTimeBlocks();
+  renderCalendarEvents();
+  renderMonthCalendar();
+  renderWeekStrip();
+  renderTimeBlocks();
 }
+
 function renderCalendarEvents(){
   const wrap=document.getElementById('events-list');wrap.innerHTML='';
-  if(!calendarEvents.length){wrap.innerHTML='<div class="events-empty">no upcoming events found.</div>';return;}
-  calendarEvents.slice(0,8).forEach(e=>{
+  const today=getTodayET();
+  const upcoming=calendarEvents.filter(e=>e.date>=today).slice(0,8);
+  if(!upcoming.length){wrap.innerHTML='<div class="events-empty">no upcoming events.</div>';return;}
+  upcoming.forEach(e=>{
     const div=document.createElement('div');div.className='event-item';
+    const tagDot=TAG_COLORS[e.tag]||'rgba(26,26,46,0.3)';
     div.innerHTML=`<div class="event-date-badge"><div class="edb-month">${fmtMonth(e.date)}</div><div class="edb-day">${fmtDay(e.date)}</div></div><div class="event-body"><div class="event-name">${e.name}</div><div class="event-tags">${e.tags.map(t=>`<span class="tb-tag ${t.toLowerCase().replace(/[^a-z]/g,'').slice(0,10)}">${t}</span>`).join('')}</div></div>`;
     wrap.appendChild(div);
   });
 }
 
-/* ── TO-DO (auto-syncs to Notion Assignments DB) ── */
-const TODO_STORE='wc_todo_v2';
-let todos=[];
-function loadTodos(){try{const d=localStorage.getItem(TODO_STORE);if(d)todos=JSON.parse(d);}catch(e){}}
-function saveTodos(){localStorage.setItem(TODO_STORE,JSON.stringify(todos));}
+/* ── MONTHLY CALENDAR ── */
+const TAG_COLORS={
+  'EXAM':'#c04a4a',
+  'HOLIDAY/BREAK':'#4a8a6a',
+  'CURRICULUM':'#4a7fa5',
+  'WIN':'#7a5a92',
+  'ORIENTATION':'#9a7040',
+  'ACADEMIC TERM':'#9a8a40',
+  'BECOMING A PHYSICIAN':'#5a7a5a'
+};
 
-function setSyncStatus(state,msg){
-  document.getElementById('sync-dot').className='todo-sync-indicator'+(state==='syncing'?' syncing':state==='error'?' error':'');
-  document.getElementById('todo-sync-status').textContent=msg;
+let calYear,calMonth;
+function initCal(){const t=new Date();calYear=t.getFullYear();calMonth=t.getMonth();}
+
+function shiftMonth(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderMonthCalendar();
 }
 
-function gcalUrl(text,date){
-  const d=date.replace(/-/g,'');
-  return`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(text)}&dates=${d}/${d}&details=${encodeURIComponent('Added via Worcester Dashboard')}`;
-}
-
-function renderTodos(){
-  const wrap=document.getElementById('todo-items'),empty=document.getElementById('todo-empty');
-  wrap.innerHTML='';
-  if(!todos.length){empty.style.display='block';return;}
-  empty.style.display='none';
-  const today=getTodayET();
-  todos.forEach(t=>{
-    const div=document.createElement('div');div.className='todo-item';div.dataset.id=t.id;
-    const overdue=t.due&&t.due<today&&!t.done;
-    div.innerHTML=`
-      <div class="todo-cb${t.done?' done':''}"></div>
-      <div class="todo-text${t.done?' done':''}">${t.text}</div>
-      ${t.due?`<span class="todo-due-badge${overdue?' overdue':''}">${fmtMonthDay(t.due)}</span>`:''}
-      ${t.due&&!t.done?`<a class="todo-gcal-btn" href="${gcalUrl(t.text,t.due)}" target="_blank" rel="noopener" title="Add to Google Calendar">📅</a>`:''}
-      <button class="todo-del" title="Delete">✕</button>
-    `;
-    div.querySelector('.todo-cb').onclick=()=>{t.done=!t.done;saveTodos();renderTodos();};
-    div.querySelector('.todo-text').onclick=()=>{t.done=!t.done;saveTodos();renderTodos();};
-    div.querySelector('.todo-del').onclick=e=>{
-      e.stopPropagation();div.classList.add('removing');
-      setTimeout(()=>{todos=todos.filter(x=>x.id!==t.id);saveTodos();renderTodos();},200);
-    };
-    wrap.appendChild(div);
+function buildEventMap(){
+  const map={};
+  calendarEvents.forEach(e=>{
+    let cur=e.date;
+    const end=e.endDate||e.date;
+    while(cur<=end){
+      if(!map[cur])map[cur]=[];
+      map[cur].push(e);
+      cur=addDays(cur,1);
+    }
   });
+  return map;
 }
 
-async function pushTaskToNotion(task){
-  const props={
-    'Name':{title:[{text:{content:task.text}}]},
-    'Status':{status:{name:'Not started'}},
-    'Type':{select:{name:'Assignment'}}
-  };
-  if(task.due)props['Due Date']={date:{start:task.due}};
-  const result=await notionAPI('pages','POST',{parent:{database_id:ASSIGNMENTS_DB},properties:props});
-  return result.id||null;
-}
-
-async function addTodo(){
-  const inp=document.getElementById('todo-input'),dateInp=document.getElementById('todo-date');
-  const text=inp.value.trim();if(!text)return;
-  const due=dateInp.value||null;
-  const task={id:Date.now(),text,due,done:false,notionId:null};
-  todos.unshift(task);inp.value='';dateInp.value='';
-  saveTodos();renderTodos();
-  setSyncStatus('syncing','syncing...');
-  try{
-    task.notionId=await pushTaskToNotion(task);
-    saveTodos();
-    setSyncStatus('ok','synced to notion ✓');
-    setTimeout(()=>{setSyncStatus('ok','synced to notion');fetchNotionTasks();},2500);
-  }catch(e){
-    setSyncStatus('error','sync failed');
-    console.warn('Notion push failed',e);
+function renderMonthCalendar(){
+  const wrap=document.getElementById('cal-grid');wrap.innerHTML='';
+  // Day headers
+  ['S','M','T','W','T','F','S'].forEach(d=>{
+    const h=document.createElement('div');h.className='cal-day-hdr';h.textContent=d;wrap.appendChild(h);
+  });
+  const eventMap=buildEventMap();
+  const today=getTodayET();
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay=new Date(calYear,calMonth+1,0).getDate();
+  const startDow=firstDay.getDay();
+  // prev month fill
+  const prevLast=new Date(calYear,calMonth,0).getDate();
+  for(let i=startDow-1;i>=0;i--){
+    const d=prevLast-i;
+    const m=calMonth===0?12:calMonth;
+    const y=calMonth===0?calYear-1:calYear;
+    wrap.appendChild(makeCalCell(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,d,true,eventMap,today));
   }
+  // current month
+  for(let d=1;d<=lastDay;d++){
+    wrap.appendChild(makeCalCell(`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,d,false,eventMap,today));
+  }
+  // next month fill
+  const filled=startDow+lastDay;
+  const tail=filled%7===0?0:7-(filled%7);
+  for(let d=1;d<=tail;d++){
+    const m=calMonth===11?1:calMonth+2;
+    const y=calMonth===11?calYear+1:calYear;
+    wrap.appendChild(makeCalCell(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,d,true,eventMap,today));
+  }
+  document.getElementById('cal-month-title').textContent=firstDay.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  // hide selected panel when month changes
+  document.getElementById('cal-selected-events').classList.remove('visible');
 }
 
-document.getElementById('todo-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
-document.getElementById('todo-date').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
+function makeCalCell(dateStr,dayNum,otherMonth,eventMap,today){
+  const events=eventMap[dateStr]||[];
+  const div=document.createElement('div');
+  div.className='cal-day'+(otherMonth?' other-month':'')+(dateStr===today?' today':'')+(events.some(e=>e.tags.includes('EXAM'))?' exam-day':'')+(events.length?' has-event':'');
+  const num=document.createElement('div');num.className='cal-day-num';num.textContent=dayNum;div.appendChild(num);
+  if(events.length){
+    const dots=document.createElement('div');dots.className='cal-dots';
+    const seen=new Set();
+    events.forEach(e=>{
+      const tag=e.tags[0]||'';
+      if(!seen.has(tag)&&seen.size<4){seen.add(tag);const dot=document.createElement('div');dot.className='cal-dot';dot.style.background=TAG_COLORS[tag]||'rgba(26,26,46,0.35)';dots.appendChild(dot);}
+    });
+    div.appendChild(dots);
+    div.title=events.map(e=>e.name).join('\n');
+    div.onclick=()=>showDayEvents(dateStr,events);
+  }
+  return div;
+}
+
+function showDayEvents(dateStr,events){
+  const panel=document.getElementById('cal-selected-events');
+  const title=document.getElementById('cal-sel-title');
+  const list=document.getElementById('cal-sel-list');
+  title.textContent=new Date(dateStr+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  list.innerHTML='';
+  events.forEach(e=>{
+    const div=document.createElement('div');div.className='cal-sel-item';
+    div.innerHTML=`<div class="cal-sel-dot" style="background:${TAG_COLORS[e.tags[0]]||'rgba(26,26,46,0.35)'}"></div><div class="cal-sel-name">${e.name}</div>`;
+    list.appendChild(div);
+  });
+  panel.classList.add('visible');
+}
 
 /* ── INIT ── */
-loadTB();loadTodos();renderTodos();
+initCal();
+loadTB();
 renderWeekStrip();renderTimeBlocks();
 fetchNotionTasks();
 fetchCalendarEvents();
