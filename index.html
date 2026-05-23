@@ -204,7 +204,7 @@ function moonPhaseName(p){
 }
 function drawMoon(svg,phase){
   svg.innerHTML='';
-  const r=18,cx=24,cy=24,BG='#f2ede4',INK='#4a3f30';
+  const r=18,cx=24,cy=24,BG='#ffffff',INK='#4a3f30';
   // Outer glow ring
   svg.appendChild(el('circle',{cx,cy,r:r+1,fill:'none',stroke:'rgba(74,63,48,0.12)','stroke-width':'2'}));
   // Moon disk
@@ -285,8 +285,12 @@ function degToCard(d){const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S',
 function uvLabel(u){if(u<=2)return'Low';if(u<=5)return'Moderate';if(u<=7)return'High';if(u<=10)return'Very High';return'Extreme';}
 function fmtSunTime(iso){
   if(!iso)return'—';
-  const d=new Date(iso);
-  return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'America/New_York'}).toLowerCase();
+  // Open-Meteo returns times already in the requested timezone (America/New_York)
+  // Parse directly from the string to avoid browser-local re-interpretation
+  const [,time]=iso.split('T');
+  const [h,m]=time.split(':').map(Number);
+  const ampm=h>=12?'pm':'am';
+  return`${h%12||12}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
 /* ── FETCH ── */
