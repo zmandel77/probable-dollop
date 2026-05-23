@@ -3,266 +3,168 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Worcester Dashboard</title>
+<title>Worcester</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --font:'Courier Prime',monospace;
-  --ink:#1a1a2e;
-  --border:rgba(255,255,255,0.28);
-  --card:rgba(255,255,255,0.22);
-  --card-hover:rgba(255,255,255,0.32);
-  --radius:14px;
-  --shadow:0 4px 24px rgba(0,0,0,0.10);
+body{
+  min-height:100vh;
+  font-family:'Courier Prime',monospace;
+  background:#f2ede4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
 }
-html{scroll-behavior:smooth;}
-body{min-height:100vh;font-family:var(--font);color:var(--ink);background:var(--grad,#a8c8e8);transition:background 3s ease;}
 
-.dashboard{
-  max-width:1200px;
-  margin:0 auto;
-  padding:1.5rem 1.2rem 4rem;
-  display:flex;flex-direction:column;gap:1.2rem;
-  position:relative;z-index:1;
+.widget{
+  display:flex;
+  align-items:center;
+  gap:3rem;
+  flex-wrap:wrap;
 }
-.dash-grid{display:grid;grid-template-columns:3fr 2fr;gap:1.2rem;align-items:start;}
-@media(max-width:720px){.dash-grid{grid-template-columns:1fr;}}
-.dash-right{display:flex;flex-direction:column;gap:1.2rem;}
 
-.card{background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.4rem 1.6rem;transition:background .2s;}
-.card:hover{background:var(--card-hover);}
-.card-label{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:rgba(26,26,46,0.55);margin-bottom:.8rem;}
+.clock-block{}
+.clock-date{
+  font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+  color:#8a7f70;margin-bottom:.3rem;
+}
+.clock-time{
+  font-size:64px;line-height:1;font-weight:700;
+  color:#2a2318;letter-spacing:-.01em;
+}
+.clock-ampm{
+  font-size:20px;font-weight:400;margin-left:6px;
+  color:#8a7f70;vertical-align:super;font-size:14px;
+}
+.clock-loc{
+  font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:#a8998a;margin-top:.4rem;
+}
 
-/* §1 WEATHER + CLOCK */
-#scene{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.wc-grid{display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap;}
-.clock-date{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(26,26,46,0.6);}
-.clock-time{font-size:52px;line-height:1;font-weight:700;}
-.clock-ampm{font-size:18px;font-weight:400;margin-left:4px;color:rgba(26,26,46,0.6);}
-.clock-loc{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,46,0.5);margin-top:2px;}
-.wc-divider{width:1px;height:60px;background:var(--border);flex-shrink:0;}
-.weather-block{display:flex;align-items:center;gap:.9rem;}
-.wx-temp{font-size:32px;font-weight:700;display:block;}
-.wx-desc{font-size:12px;color:rgba(26,26,46,0.6);font-style:italic;margin-top:2px;}
+.divider{
+  width:1px;height:80px;
+  background:rgba(42,35,24,0.12);
+  flex-shrink:0;
+}
 
-/* §2 DAILY PLANNER */
-.planner-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
-.planner-nav-title{font-size:14px;font-weight:700;}
-.planner-nav-arrows{display:flex;gap:.4rem;}
-.nav-btn{font-family:var(--font);font-size:13px;background:rgba(255,255,255,0.25);border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer;color:var(--ink);transition:background .15s;}
-.nav-btn:hover{background:rgba(255,255,255,0.4);}
-.week-strip{display:flex;gap:.3rem;margin-bottom:1.2rem;overflow-x:auto;padding-bottom:4px;}
-.week-strip::-webkit-scrollbar{height:3px;}
-.week-strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.3);border-radius:3px;}
-.week-day{flex-shrink:0;width:44px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:10px;cursor:pointer;border:1px solid transparent;transition:all .15s;}
-.week-day:hover{background:rgba(255,255,255,0.25);}
-.week-day.today{background:rgba(255,255,255,0.35);border-color:var(--border);}
-.week-day.has-event::after{content:'';width:5px;height:5px;border-radius:50%;background:rgba(26,26,46,0.4);display:block;}
-.wd-name{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.55);}
-.wd-num{font-size:15px;font-weight:700;}
-.wd-month{font-size:9px;color:rgba(26,26,46,0.45);}
-.planner-split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-@media(max-width:480px){.planner-split{grid-template-columns:1fr;}}
-.planner-col-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,46,0.5);margin-bottom:.5rem;}
-.time-blocks{display:flex;flex-direction:column;gap:.3rem;}
-.time-block{display:flex;align-items:flex-start;gap:.6rem;padding:.45rem .6rem;border-radius:8px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:12px;transition:background .15s;position:relative;}
-.time-block:hover{background:rgba(255,255,255,0.3);}
-.tb-time{font-size:10px;letter-spacing:.06em;color:rgba(26,26,46,0.55);white-space:nowrap;margin-top:1px;min-width:44px;}
-.tb-content{flex:1;}
-.tb-title{font-weight:700;font-size:12px;}
-.tb-sub{font-size:10px;color:rgba(26,26,46,0.55);font-style:italic;margin-top:1px;}
-.tb-tag{font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:99px;margin-top:3px;display:inline-block;}
-.tb-tag.exam{background:rgba(192,74,74,0.18);color:#8b3030;}
-.tb-tag.holiday{background:rgba(74,138,106,0.18);color:#2a6644;}
-.tb-tag.curriculum{background:rgba(74,127,165,0.18);color:#2a5a80;}
-.tb-tag.orientation{background:rgba(160,120,60,0.18);color:#7a5420;}
-.tb-tag.win{background:rgba(160,100,160,0.18);color:#6a3080;}
-.tb-now{position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(224,92,48,0.7);border-radius:3px 0 0 3px;}
-.add-block-btn{font-family:var(--font);font-size:11px;letter-spacing:.07em;text-transform:uppercase;background:rgba(255,255,255,0.18);border:1px dashed rgba(255,255,255,0.4);border-radius:8px;padding:6px;width:100%;cursor:pointer;color:rgba(26,26,46,0.5);margin-top:.3rem;transition:all .15s;}
-.add-block-btn:hover{background:rgba(255,255,255,0.3);color:var(--ink);}
-.task-list-mini{display:flex;flex-direction:column;gap:.3rem;}
-.task-mini{display:flex;align-items:flex-start;gap:.5rem;padding:.45rem .6rem;border-radius:8px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:12px;transition:background .15s;}
-.task-mini:hover{background:rgba(255,255,255,0.3);}
-.task-mini-cb{width:14px;height:14px;border-radius:4px;border:1.5px solid rgba(26,26,46,0.35);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;}
-.task-mini-cb.done{background:rgba(26,26,46,0.5);border-color:transparent;}
-.task-mini-cb.done::after{content:'✓';font-size:8px;color:#fff;}
-.task-mini-text{flex:1;line-height:1.3;}
-.task-mini-text.done{text-decoration:line-through;opacity:0.5;}
-.task-mini-due{font-size:9px;color:rgba(26,26,46,0.5);white-space:nowrap;flex-shrink:0;}
-.task-mini-due.overdue{color:#c04a4a;}
-.no-tasks{font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.5rem;}
-.notion-sync-label{font-size:10px;letter-spacing:.06em;color:rgba(26,26,46,0.4);display:flex;align-items:center;gap:.35rem;margin-top:.5rem;}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:#5a8f6a;animation:syncpulse 2s ease-in-out infinite;}
-@keyframes syncpulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-
-/* §3 MONTH CALENDAR */
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
-.cal-month-title{font-size:14px;font-weight:700;letter-spacing:.01em;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:.8rem;}
-.cal-day-hdr{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:rgba(26,26,46,0.4);text-align:center;padding:0 0 5px;}
-.cal-day{min-height:38px;border-radius:7px;padding:4px 3px 3px;display:flex;flex-direction:column;align-items:center;cursor:default;transition:background .12s;}
-.cal-day.other-month .cal-day-num{opacity:.3;}
-.cal-day.today{background:rgba(255,255,255,0.38);border:1px solid var(--border);}
-.cal-day.has-event{cursor:pointer;}
-.cal-day.has-event:hover{background:rgba(255,255,255,0.28);}
-.cal-day.exam-day{background:rgba(192,74,74,0.13);}
-.cal-day.exam-day.today{background:rgba(192,74,74,0.22);}
-.cal-day-num{font-size:11px;font-weight:700;line-height:1.3;}
-.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:3px;}
-.cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
-/* selected day event panel */
-.cal-selected-events{display:none;margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,0.2);}
-.cal-selected-events.visible{display:block;}
-.cal-sel-title{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.45);margin-bottom:.4rem;}
-.cal-sel-item{display:flex;align-items:flex-start;gap:.5rem;padding:.4rem .5rem;border-radius:8px;background:rgba(255,255,255,0.18);border:1px solid var(--border);font-size:12px;margin-bottom:.3rem;}
-.cal-sel-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
-.cal-sel-name{flex:1;font-weight:700;line-height:1.3;}
-
-/* §4 UPCOMING EVENTS */
-.events-list{display:flex;flex-direction:column;gap:.35rem;}
-.event-item{display:flex;align-items:flex-start;gap:.7rem;padding:.5rem .65rem;border-radius:9px;background:rgba(255,255,255,0.18);border:1px solid var(--border);}
-.event-date-badge{flex-shrink:0;text-align:center;min-width:32px;}
-.edb-month{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,46,0.5);}
-.edb-day{font-size:17px;font-weight:700;line-height:1;}
-.event-body{flex:1;}
-.event-name{font-size:12px;font-weight:700;line-height:1.3;}
-.event-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.25rem;}
-.events-empty{font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.3rem 0;}
+.weather-block{
+  display:flex;align-items:center;gap:1.2rem;
+}
+.wx-temp{
+  font-size:48px;font-weight:700;
+  color:#2a2318;letter-spacing:-.02em;display:block;
+}
+.wx-desc{
+  font-size:12px;color:#8a7f70;font-style:italic;
+  margin-top:.2rem;letter-spacing:.02em;
+}
 </style>
 </head>
 <body>
 
-<svg id="scene" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"></svg>
+<div class="widget">
 
-<div class="dashboard">
-
-  <!-- §1 WEATHER + CLOCK -->
-  <div class="card" id="weather-card">
-    <div class="wc-grid">
-      <div class="clock-block">
-        <div class="clock-date" id="cl-date">—</div>
-        <div class="clock-time" id="cl-time">—<span class="clock-ampm" id="cl-ampm"></span></div>
-        <div class="clock-loc">Worcester, MA</div>
-      </div>
-      <div class="wc-divider"></div>
-      <div class="weather-block">
-        <svg id="wx-icon" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
-        <div>
-          <span class="wx-temp" id="wx-temp">—</span>
-          <span class="wx-desc" id="wx-desc">loading...</span>
-        </div>
-      </div>
-    </div>
+  <div class="clock-block">
+    <div class="clock-date" id="cl-date">—</div>
+    <div class="clock-time" id="cl-time">—<span class="clock-ampm" id="cl-ampm"></span></div>
+    <div class="clock-loc">Worcester, MA</div>
   </div>
 
-  <!-- 2-col grid -->
-  <div class="dash-grid">
+  <div class="divider"></div>
 
-    <!-- LEFT: Daily Planner -->
-    <div class="card">
-      <div class="card-label">daily planner</div>
-      <div class="planner-nav">
-        <div class="planner-nav-title" id="planner-title">Today</div>
-        <div class="planner-nav-arrows">
-          <button class="nav-btn" onclick="shiftWeek(-1)">‹</button>
-          <button class="nav-btn" onclick="shiftWeek(0)">today</button>
-          <button class="nav-btn" onclick="shiftWeek(1)">›</button>
-        </div>
-      </div>
-      <div class="week-strip" id="week-strip"></div>
-      <div class="planner-split">
-        <div>
-          <div class="planner-col-label">time blocks</div>
-          <div class="time-blocks" id="time-blocks"></div>
-          <button class="add-block-btn" onclick="addTimeBlock()">+ add block</button>
-        </div>
-        <div>
-          <div class="planner-col-label">assignments due</div>
-          <div class="task-list-mini" id="notion-tasks-mini"></div>
-          <div class="notion-sync-label"><div class="sync-dot"></div>synced from notion</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT col -->
-    <div class="dash-right">
-
-      <!-- Monthly Calendar -->
-      <div class="card">
-        <div class="card-label">academic calendar</div>
-        <div class="cal-nav">
-          <button class="nav-btn" onclick="shiftMonth(-1)">‹</button>
-          <span class="cal-month-title" id="cal-month-title">—</span>
-          <button class="nav-btn" onclick="shiftMonth(1)">›</button>
-        </div>
-        <div class="cal-grid" id="cal-grid"></div>
-        <div class="cal-selected-events" id="cal-selected-events">
-          <div class="cal-sel-title" id="cal-sel-title"></div>
-          <div id="cal-sel-list"></div>
-        </div>
-        <div class="notion-sync-label" style="margin-top:.5rem"><div class="sync-dot"></div>synced from notion</div>
-      </div>
-
-      <!-- Upcoming Events -->
-      <div class="card">
-        <div class="card-label">upcoming</div>
-        <div class="events-list" id="events-list"><div class="events-empty">loading events...</div></div>
-      </div>
-
+  <div class="weather-block">
+    <svg id="wx-icon" width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div>
+      <span class="wx-temp" id="wx-temp">—</span>
+      <span class="wx-desc" id="wx-desc">loading...</span>
     </div>
   </div>
 
 </div>
 
 <script>
-/* ── CONFIG ── */
-const NOTION_TOKEN   = 'ntn_b9621396454auHpstnIGoBQlq2gScDaXg3Bkq3oKIB9d6j';
-const ASSIGNMENTS_DB = '7a892195dc594a9e8e1057b22428669f';
-const CALENDAR_DB    = '29123d7a-dbe6-80c9-ac72-d77d8f595a47';
-const NOTION_PROXY   = 'https://api.allorigins.win/raw?url=';
-
-/* ── GRADIENT ENGINE ── */
-const GRADIENTS=[
-  {h:0,  grad:'linear-gradient(160deg,#0d1b3e 0%,#1a2a4a 50%,#2a3a5a 100%)'},
-  {h:5,  grad:'linear-gradient(160deg,#1a1a3e 0%,#3a2a5a 40%,#6a4a6a 100%)'},
-  {h:6,  grad:'linear-gradient(160deg,#c07050 0%,#e09060 40%,#f0c080 100%)'},
-  {h:8,  grad:'linear-gradient(160deg,#e0b070 0%,#f0d090 40%,#d6e8f5 100%)'},
-  {h:10, grad:'linear-gradient(160deg,#b8d8f0 0%,#c8e4f8 50%,#daf0ff 100%)'},
-  {h:14, grad:'linear-gradient(160deg,#a8cce8 0%,#c0daf5 50%,#d6e8f5 100%)'},
-  {h:17, grad:'linear-gradient(160deg,#d6c8a8 0%,#e8d8b0 40%,#f0e0b8 100%)'},
-  {h:19, grad:'linear-gradient(160deg,#c06040 0%,#d07850 40%,#e09870 100%)'},
-  {h:21, grad:'linear-gradient(160deg,#2a1a3a 0%,#1a1a3a 50%,#0d1020 100%)'},
-  {h:24, grad:'linear-gradient(160deg,#0d1b3e 0%,#1a2a4a 50%,#2a3a5a 100%)'},
-];
-function getGradient(h){for(let i=GRADIENTS.length-1;i>=0;i--){if(h>=GRADIENTS[i].h)return GRADIENTS[i].grad;}return GRADIENTS[0].grad;}
-function updateGradient(){const h=parseInt(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',hour12:false}).format(new Date()));document.body.style.background=getGradient(h);}
-updateGradient();setInterval(updateGradient,60000);
-
-/* ── CLOCK ── */
+/* CLOCK */
 function tick(){
   const n=new Date(),tz='America/New_York';
   const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}).formatToParts(n);
   const g=t=>p.find(x=>x.type===t)?.value||'';
-  document.getElementById('cl-date').textContent=new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'long',month:'long',day:'numeric',year:'numeric'}).format(n);
+  document.getElementById('cl-date').textContent=
+    new Intl.DateTimeFormat('en-US',{timeZone:tz,weekday:'long',month:'long',day:'numeric',year:'numeric'}).format(n);
   document.getElementById('cl-time').childNodes[0].nodeValue=g('hour')+':'+g('minute')+':'+g('second');
-  document.getElementById('cl-ampm').textContent=g('dayperiod').toLowerCase();
+  document.getElementById('cl-ampm').textContent=' '+g('dayperiod').toLowerCase();
 }
 tick();setInterval(tick,1000);
 
-/* ── WEATHER ── */
+/* WEATHER ICONS (warm ink palette for ecru bg) */
 const NS='http://www.w3.org/2000/svg';
-function svgEl(tag,a){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);return e;}
-function svgAnim(e,attr,vals,dur,delay){const a=svgEl('animate',{attributeName:attr,values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',calcMode:'easeInOut'});e.appendChild(a);return e;}
-function svgTA(e,vals,dur){const a=svgEl('animateTransform',{attributeName:'transform',type:'translate',values:vals,dur:dur+'s',begin:'0s',repeatCount:'indefinite',additive:'sum'});e.appendChild(a);}
-function wxCloud(svg,cx,cy,op){
-  const g=svgEl('g',{opacity:op});
-  g.appendChild(svgEl('ellipse',{cx,cy,rx:13,ry:8,fill:'#2e2c2c'}));
-  g.appendChild(svgEl('ellipse',{cx:cx-9,cy:cy+3,rx:9,ry:7,fill:'#2e2c2c'}));
-  g.appendChild(svgEl('ellipse',{cx:cx+9,cy:cy+3,rx:8,ry:6,fill:'#2e2c2c'}));
-  svgTA(g,'0,0;3,0;0,0',5);svg.appendChild(g);
+const INK='#4a3f30', INKL='#8a7f70', INKLL='#c8bfb0';
+function el(tag,a){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function anim(e,attr,vals,dur,delay){
+  const a=el('animate',{attributeName:attr,values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',calcMode:'easeInOut'});
+  e.appendChild(a);return e;
 }
+
+function drawIcon(svg,code,isNight){
+  svg.innerHTML='';
+  const type=wxType(code,isNight);
+  const cx=36,cy=36;
+
+  if(type==='night'){
+    /* crescent moon */
+    const moon=el('path',{d:'M44 24 A14 14 0 1 0 44 48 A10 10 0 1 1 44 24',fill:INK,opacity:'0.85'});
+    anim(moon,'opacity','0.85;0.6;0.85',4,0);svg.appendChild(moon);
+    [[14,14],[58,10],[10,52],[60,50],[20,38]].forEach(([x,y])=>{
+      const s=el('circle',{cx:x,cy:y,r:'1.2',fill:INKL,opacity:'0'});anim(s,'opacity','0;0.7;0',2.5,Math.random()*2);svg.appendChild(s);
+    });
+  } else if(type==='clear'){
+    /* sun */
+    const sun=el('circle',{cx,cy,r:'13',fill:INK,opacity:'0.9'});anim(sun,'r','13;15;13',4,0);svg.appendChild(sun);
+    [0,45,90,135,180,225,270,315].forEach((a,i)=>{
+      const r=a*Math.PI/180;
+      const ray=el('line',{x1:cx+18*Math.cos(r),y1:cy+18*Math.sin(r),x2:cx+24*Math.cos(r),y2:cy+24*Math.sin(r),stroke:INK,'stroke-width':'2','stroke-linecap':'round'});
+      anim(ray,'opacity','0.8;0.2;0.8',3.5,i*0.4);svg.appendChild(ray);
+    });
+  } else if(type==='partly'){
+    const sun=el('circle',{cx:24,cy:26,r:'10',fill:INKL,opacity:'0.7'});anim(sun,'cy','26;23;26',3.5,0);svg.appendChild(sun);
+    cloud(svg,40,46,1);
+  } else if(type==='cloudy'){
+    cloud(svg,36,38,0.4);cloud(svg,36,48,1);
+  } else if(type==='rain'){
+    cloud(svg,36,38,1);
+    [[26,52,0],[34,57,0.3],[42,52,0.6],[30,62,0.9]].forEach(([x,y,d])=>{
+      const ln=el('line',{x1:x,y1:y,x2:x-4,y2:y+8,stroke:INKL,'stroke-width':'1.3','stroke-linecap':'round',opacity:'0'});
+      anim(ln,'opacity','0;0.8;0',1.1,d);svg.appendChild(ln);
+    });
+  } else if(type==='snow'){
+    cloud(svg,36,38,1);
+    [[26,54,0],[36,59,0.5],[46,54,1]].forEach(([x,y,d])=>{
+      const g=el('g');
+      [0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(el('line',{x1:x-5*Math.cos(r),y1:y-5*Math.sin(r),x2:x+5*Math.cos(r),y2:y+5*Math.sin(r),stroke:INKL,'stroke-width':'1.1','stroke-linecap':'round'}));});
+      anim(g,'opacity','0;0.9;0',2,d);svg.appendChild(g);
+    });
+  } else if(type==='fog'){
+    [[8,28,52,0],[8,36,44,0.4],[8,44,50,0.8],[8,52,38,1.2]].forEach(([x,y,w,d])=>{
+      const ln=el('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:INKL,'stroke-width':'2','stroke-linecap':'round',opacity:'0.5'});
+      anim(ln,'opacity','0.5;0.15;0.5',3.5,d);svg.appendChild(ln);
+    });
+  } else if(type==='thunder'){
+    cloud(svg,36,36,1);
+    const bolt=el('polygon',{points:'40,18 32,34 38,34 28,56 46,30 40,30 46,18',fill:INK,opacity:'0'});
+    anim(bolt,'opacity','0;0;0;1;0.7;0;0;0;0.9;0',3.5,0);svg.appendChild(bolt);
+  }
+}
+
+function cloud(svg,cx,cy,op){
+  const g=el('g',{opacity:op});
+  g.appendChild(el('ellipse',{cx,cy,rx:'16',ry:'9',fill:INK}));
+  g.appendChild(el('ellipse',{cx:cx-11,cy:cy+4,rx:'10',ry:'8',fill:INK}));
+  g.appendChild(el('ellipse',{cx:cx+11,cy:cy+4,rx:'9',ry:'7',fill:INK}));
+  const mv=el('animateTransform',{attributeName:'transform',type:'translate',values:'0,0;3,0;0,0',dur:'5s',begin:'0s',repeatCount:'indefinite',additive:'sum'});
+  g.appendChild(mv);svg.appendChild(g);
+}
+
 const WX_CODES={0:'clear',1:'mainly clear',2:'partly cloudy',3:'overcast',45:'fog',48:'fog',51:'drizzle',53:'drizzle',55:'drizzle',61:'rain',63:'rain',65:'rain',71:'snow',73:'snow',75:'snow',80:'showers',81:'showers',82:'showers',95:'thunderstorm',96:'thunderstorm',99:'thunderstorm'};
 function wxType(code,isNight){
   if(isNight&&code<=1)return'night';
@@ -271,331 +173,14 @@ function wxType(code,isNight){
   if(code>=51&&code<=65)return'rain';if(code>=71&&code<=75)return'snow';
   if(code>=80&&code<=82)return'rain';if(code>=95)return'thunder';return'cloudy';
 }
-function drawWxIcon(svg,code,isNight){
-  svg.innerHTML='';const type=wxType(code,isNight);
-  if(type==='night'){
-    const o=svgEl('circle',{cx:32,cy:30,r:12,fill:'#2e2c2c',opacity:'0.9'});svgAnim(o,'opacity','0.9;0.7;0.9',4,0);svg.appendChild(o);
-    svg.appendChild(svgEl('circle',{cx:37,cy:25,r:10,fill:'rgba(255,255,255,0.3)'}));
-  }else if(type==='clear'){
-    const sun=svgEl('circle',{cx:30,cy:30,r:10,fill:'#2e2c2c',opacity:'0.88'});svgAnim(sun,'r','10;12;10',4,0);svg.appendChild(sun);
-    [0,45,90,135,180,225,270,315].forEach(a=>{const r=a*Math.PI/180;const ray=svgEl('line',{x1:30+14*Math.cos(r),y1:30+14*Math.sin(r),x2:30+19*Math.cos(r),y2:30+19*Math.sin(r),stroke:'#5a5656','stroke-width':'1.3','stroke-linecap':'round'});svgAnim(ray,'opacity','0.7;0.2;0.7',4,a/360*4);svg.appendChild(ray);});
-  }else if(type==='partly'){
-    const sun=svgEl('circle',{cx:20,cy:22,r:8,fill:'#5a5656',opacity:'0.65'});svgAnim(sun,'cy','22;20;22',3,0);svg.appendChild(sun);wxCloud(svg,34,38,1);
-  }else if(type==='cloudy'){wxCloud(svg,30,32,0.4);wxCloud(svg,30,40,1);
-  }else if(type==='rain'){
-    wxCloud(svg,30,34,1);
-    [[22,48,0],[30,52,0.4],[38,48,0.8],[26,56,1.2]].forEach(([x,y,d])=>{const ln=svgEl('line',{x1:x,y1:y,x2:x-3,y2:y+6,stroke:'#5a5656','stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});svgAnim(ln,'opacity','0;0.8;0',1.2,d);svg.appendChild(ln);});
-  }else if(type==='snow'){
-    wxCloud(svg,30,34,1);
-    [[22,48,0],[30,52,0.6],[38,48,1.1]].forEach(([x,y,d])=>{const g=svgEl('g');[0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(svgEl('line',{x1:x-4*Math.cos(r),y1:y-4*Math.sin(r),x2:x+4*Math.cos(r),y2:y+4*Math.sin(r),stroke:'#5a5656','stroke-width':'1','stroke-linecap':'round'}));});svgAnim(g,'opacity','0;0.9;0',2,d);svg.appendChild(g);});
-  }else if(type==='fog'){
-    [[6,22,48,0],[6,30,40,0.4],[6,38,46,0.8],[6,46,32,1.2]].forEach(([x,y,w,d])=>{const ln=svgEl('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:'#5a5656','stroke-width':'1.4','stroke-linecap':'round',opacity:'0.5'});svgAnim(ln,'opacity','0.5;0.15;0.5',3,d);svg.appendChild(ln);});
-  }else if(type==='thunder'){
-    wxCloud(svg,30,32,1);[[22,46,0],[30,50,0.4],[38,46,0.8]].forEach(([x,y,d])=>{const ln=svgEl('line',{x1:x,y1:y,x2:x-3,y2:y+6,stroke:'#5a5656','stroke-width':'1.1','stroke-linecap':'round',opacity:'0'});svgAnim(ln,'opacity','0;0.8;0',1.2,d);svg.appendChild(ln);});
-    const bolt=svgEl('polygon',{points:'34,16 27,30 33,30 25,48 40,26 33,26 39,16',fill:'#2e2c2c',opacity:'0'});svgAnim(bolt,'opacity','0;0;0;1;0.8;0;0;0;1;0',3.5,0);svg.appendChild(bolt);
-  }
-}
-function buildWxScene(code,isNight){
-  const scene=document.getElementById('scene');scene.innerHTML='';
-  const type=wxType(code,isNight);
-  function scCloud(y,op,spd,delay){
-    const g=svgEl('g',{opacity:op});
-    g.appendChild(svgEl('ellipse',{cx:0,cy:0,rx:55,ry:28,fill:'#2e2c2c'}));
-    g.appendChild(svgEl('ellipse',{cx:-40,cy:10,rx:35,ry:22,fill:'#2e2c2c'}));
-    g.appendChild(svgEl('ellipse',{cx:40,cy:10,rx:32,ry:20,fill:'#2e2c2c'}));
-    const a=svgEl('animateTransform',{attributeName:'transform',type:'translate',values:`-200,${y};1200,${y}`,dur:spd+'s',begin:delay+'s',repeatCount:'indefinite',calcMode:'linear'});
-    g.appendChild(a);scene.appendChild(g);
-  }
-  if(type==='clear'){
-    const g=svgEl('g',{opacity:'0.1'});const sun=svgEl('circle',{cx:860,cy:80,r:100,fill:'#2e2c2c'});svgAnim(sun,'r','100;110;100',6,0);g.appendChild(sun);scene.appendChild(g);
-    scCloud(100,0.06,65,5);scCloud(340,0.04,85,25);
-  }else if(type==='partly'){scCloud(80,0.07,60,0);scCloud(320,0.05,80,20);
-  }else if(type==='cloudy'){scCloud(50,0.08,55,0);scCloud(190,0.06,72,12);scCloud(350,0.07,65,28);scCloud(470,0.05,90,5);
-  }else if(type==='rain'||type==='thunder'){
-    scCloud(50,0.08,55,0);scCloud(200,0.06,70,15);scCloud(380,0.07,65,30);
-    for(let i=0;i<40;i++){const x=Math.random()*1000,y=Math.random()*600;const d=svgEl('line',{x1:x,y1:y,x2:x-5,y2:y+16,stroke:'#5a5656','stroke-width':'0.7',opacity:'0'});const dur=0.8+Math.random()*0.5,dl=Math.random()*dur;svgAnim(d,'opacity','0;0.35;0',dur,dl);scene.appendChild(d);}
-    if(type==='thunder'){[200,500,800].forEach((bx,i)=>{const bolt=svgEl('polygon',{points:`${bx},20 ${bx-25},140 ${bx-8},140 ${bx-42},300 ${bx+35},120 ${bx+8},120 ${bx+42},20`,fill:'#2e2c2c',opacity:'0'});const a=svgEl('animate',{attributeName:'opacity',values:'0;0;0;0.15;0.1;0;0;0;0.12;0',dur:(6+i*2)+'s',begin:(i*2)+'s',repeatCount:'indefinite'});bolt.appendChild(a);scene.appendChild(bolt);});}
-  }else if(type==='snow'){
-    scCloud(50,0.08,55,0);scCloud(200,0.06,70,15);scCloud(380,0.07,65,30);
-    for(let i=0;i<30;i++){const x=Math.random()*1000,y=Math.random()*600;const g=svgEl('g',{opacity:'0'});[0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(svgEl('line',{x1:x-5*Math.cos(r),y1:y-5*Math.sin(r),x2:x+5*Math.cos(r),y2:y+5*Math.sin(r),stroke:'#8a8686','stroke-width':'0.9','stroke-linecap':'round'}));});const dur=2+Math.random()*2,dl=Math.random()*dur;svgAnim(g,'opacity','0;0.4;0',dur,dl);scene.appendChild(g);}
-  }else if(type==='fog'){
-    for(let i=0;i<8;i++){const y=40+i*68,w=200+Math.random()*400,x=Math.random()*500;const ln=svgEl('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:'#5a5656','stroke-width':'16','stroke-linecap':'round',opacity:'0'});const dur=4+Math.random()*4,dl=Math.random()*dur;svgAnim(ln,'opacity','0;0.07;0',dur,dl);scene.appendChild(ln);}
-  }else if(type==='night'){
-    const g=svgEl('g',{opacity:'0.1'});const o=svgEl('circle',{cx:820,cy:90,r:70,fill:'#2e2c2c'});svgAnim(o,'opacity','1;0.75;1',5,0);g.appendChild(o);g.appendChild(svgEl('circle',{cx:848,cy:65,r:58,fill:'rgba(255,255,255,0.15)'}));scene.appendChild(g);
-    for(let i=0;i<60;i++){const s=svgEl('circle',{cx:Math.random()*1000,cy:Math.random()*450,r:0.7+Math.random()*1.1,fill:'#2e2c2c',opacity:'0'});const dur=2+Math.random()*4,dl=Math.random()*dur;svgAnim(s,'opacity','0;0.2;0',dur,dl);scene.appendChild(s);}
-  }
-}
+
 fetch('https://api.open-meteo.com/v1/forecast?latitude=42.2626&longitude=-71.8023&current_weather=true&temperature_unit=fahrenheit')
 .then(r=>r.json()).then(d=>{
   const c=d.current_weather;
   document.getElementById('wx-temp').textContent=Math.round(c.temperature)+'°F';
   document.getElementById('wx-desc').textContent=WX_CODES[c.weathercode]||'';
-  drawWxIcon(document.getElementById('wx-icon'),c.weathercode,c.is_day===0);
-  buildWxScene(c.weathercode,c.is_day===0);
+  drawIcon(document.getElementById('wx-icon'),c.weathercode,c.is_day===0);
 }).catch(()=>{document.getElementById('wx-desc').textContent='unavailable';});
-
-/* ── NOTION API ── */
-async function notionAPI(endpoint,method='GET',body=null){
-  const url=NOTION_PROXY+encodeURIComponent('https://api.notion.com/v1/'+endpoint);
-  const opts={method,headers:{
-    'Content-Type':'application/json',
-    'Authorization':'Bearer '+NOTION_TOKEN,
-    'Notion-Version':'2022-06-28',
-    'X-Requested-With':'XMLHttpRequest'
-  }};
-  if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(url,opts);
-  return r.json();
-}
-
-/* ── PLANNER STATE ── */
-const TZ='America/New_York';
-let plannerWeekOffset=0,selectedDate=getTodayET(),calendarEvents=[],notionTasks=[];
-
-function getTodayET(){return new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date());}
-function addDays(s,n){const d=new Date(s+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
-function fmtMonthDay(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric'});}
-function fmtWeekday(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'short'}).toUpperCase();}
-function fmtDay(s){return new Date(s+'T12:00:00Z').getUTCDate();}
-function fmtMonth(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short'});}
-
-function shiftWeek(dir){
-  if(dir===0){plannerWeekOffset=0;selectedDate=getTodayET();}else plannerWeekOffset+=dir;
-  renderWeekStrip();
-}
-function renderWeekStrip(){
-  const today=getTodayET(),base=addDays(today,plannerWeekOffset*7);
-  const dow=new Date(base+'T12:00:00Z').getUTCDay();
-  const mon=addDays(base,dow===0?-6:1-dow);
-  const strip=document.getElementById('week-strip');strip.innerHTML='';
-  for(let i=0;i<7;i++){
-    const date=addDays(mon,i);
-    const div=document.createElement('div');
-    div.className='week-day'+(date===today?' today':'');
-    if(calendarEvents.some(e=>e.date===date))div.classList.add('has-event');
-    div.innerHTML=`<div class="wd-name">${fmtWeekday(date)}</div><div class="wd-num">${fmtDay(date)}</div><div class="wd-month">${fmtMonth(date)}</div>`;
-    div.onclick=()=>{selectedDate=date;renderTimeBlocks();renderNotionTasksMini();renderWeekStrip();};
-    if(date===selectedDate)div.style.background='rgba(255,255,255,0.4)';
-    strip.appendChild(div);
-  }
-  document.getElementById('planner-title').textContent=new Date(selectedDate+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-}
-
-/* ── TIME BLOCKS ── */
-const TB_STORE='wc_timeblocks_v1';
-let timeBlocks={};
-function loadTB(){try{const d=localStorage.getItem(TB_STORE);if(d)timeBlocks=JSON.parse(d);}catch(e){}}
-function saveTB(){localStorage.setItem(TB_STORE,JSON.stringify(timeBlocks));}
-function renderTimeBlocks(){
-  const wrap=document.getElementById('time-blocks'),blocks=timeBlocks[selectedDate]||[];
-  const evts=calendarEvents.filter(e=>e.date===selectedDate);
-  wrap.innerHTML='';
-  const nowH=parseInt(new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(new Date()));
-  const all=[...evts.map(e=>({time:'',title:e.name,sub:'',tag:e.tag,isNotion:true})),...blocks];
-  if(!all.length){wrap.innerHTML='<div style="font-size:12px;color:rgba(26,26,46,0.4);font-style:italic;padding:.3rem 0">no blocks yet.</div>';return;}
-  all.forEach(b=>{
-    const div=document.createElement('div');div.className='time-block';
-    const isNow=b.time&&parseInt(b.time)===nowH;
-    div.innerHTML=`${isNow?'<div class="tb-now"></div>':''}<div class="tb-time">${b.time||'—'}</div><div class="tb-content"><div class="tb-title">${b.title}</div>${b.sub?`<div class="tb-sub">${b.sub}</div>`:''}${b.tag?`<span class="tb-tag ${b.tag.toLowerCase()}">${b.tag}</span>`:''}</div>${!b.isNotion?`<button onclick="deleteBlock('${selectedDate}',${blocks.indexOf(b)})" style="background:none;border:none;cursor:pointer;font-size:11px;color:rgba(26,26,46,0.3);opacity:0;transition:opacity .15s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">✕</button>`:''}`;
-    wrap.appendChild(div);
-  });
-}
-function deleteBlock(date,idx){if(timeBlocks[date])timeBlocks[date].splice(idx,1);saveTB();renderTimeBlocks();}
-function addTimeBlock(){
-  const time=prompt('Time? (e.g. 9am, 2pm)','');if(time===null)return;
-  const title=prompt('What? (e.g. Anki review)','');if(!title)return;
-  const sub=prompt('Notes? (optional)','');
-  if(!timeBlocks[selectedDate])timeBlocks[selectedDate]=[];
-  timeBlocks[selectedDate].push({time,title,sub:sub||''});
-  saveTB();renderTimeBlocks();
-}
-
-/* ── NOTION TASKS (Assignments DB) ── */
-function renderNotionTasksMini(){
-  const wrap=document.getElementById('notion-tasks-mini');wrap.innerHTML='';
-  const today=getTodayET();
-  const filtered=notionTasks.filter(t=>t.due?t.due<=selectedDate:selectedDate===today).slice(0,7);
-  if(!filtered.length){wrap.innerHTML='<div class="no-tasks">all clear.</div>';return;}
-  filtered.forEach(t=>{
-    const div=document.createElement('div');div.className='task-mini';
-    const overdue=t.due&&t.due<today;
-    div.innerHTML=`<div class="task-mini-cb${t.done?' done':''}"></div><div class="task-mini-text${t.done?' done':''}">${t.name}</div>${t.due?`<div class="task-mini-due${overdue?' overdue':''}">${fmtMonthDay(t.due)}</div>`:''}`;
-    wrap.appendChild(div);
-  });
-}
-async function fetchNotionTasks(){
-  try{
-    const data=await notionAPI('databases/'+ASSIGNMENTS_DB+'/query','POST',{
-      page_size:30,
-      filter:{property:'Status',status:{does_not_equal:'Done'}},
-      sorts:[{property:'Due Date',direction:'ascending'}]
-    });
-    if(data.results){
-      notionTasks=data.results.map(p=>{
-        const props=p.properties;
-        return{
-          id:p.id,
-          name:props['Name']?.title?.[0]?.plain_text||'Untitled',
-          due:props['Due Date']?.date?.start?.slice(0,10)||null,
-          done:props['Status']?.status?.name==='Done',
-          type:props['Type']?.select?.name||''
-        };
-      });
-    }
-  }catch(e){console.warn('Notion tasks fetch failed',e);}
-  renderNotionTasksMini();
-}
-
-/* ── CALENDAR EVENTS ── */
-async function fetchCalendarEvents(){
-  try{
-    const data=await notionAPI('databases/'+CALENDAR_DB+'/query','POST',{
-      page_size:100,
-      sorts:[{property:'Date',direction:'ascending'}]
-    });
-    if(data.results){
-      calendarEvents=data.results.map(p=>{
-        const props=p.properties;
-        const tags=props['Tags']?.multi_select?.map(t=>t.name)||[];
-        return{
-          id:p.id,
-          name:props['Name']?.title?.[0]?.plain_text||'Event',
-          date:props['Date']?.date?.start?.slice(0,10)||null,
-          endDate:props['Date']?.date?.end?.slice(0,10)||null,
-          tag:tags[0]||'',tags
-        };
-      }).filter(e=>e.date);
-    }
-  }catch(e){console.warn('Calendar fetch failed',e);}
-  renderCalendarEvents();
-  renderMonthCalendar();
-  renderWeekStrip();
-  renderTimeBlocks();
-}
-
-function renderCalendarEvents(){
-  const wrap=document.getElementById('events-list');wrap.innerHTML='';
-  const today=getTodayET();
-  const upcoming=calendarEvents.filter(e=>e.date>=today).slice(0,8);
-  if(!upcoming.length){wrap.innerHTML='<div class="events-empty">no upcoming events.</div>';return;}
-  upcoming.forEach(e=>{
-    const div=document.createElement('div');div.className='event-item';
-    const tagDot=TAG_COLORS[e.tag]||'rgba(26,26,46,0.3)';
-    div.innerHTML=`<div class="event-date-badge"><div class="edb-month">${fmtMonth(e.date)}</div><div class="edb-day">${fmtDay(e.date)}</div></div><div class="event-body"><div class="event-name">${e.name}</div><div class="event-tags">${e.tags.map(t=>`<span class="tb-tag ${t.toLowerCase().replace(/[^a-z]/g,'').slice(0,10)}">${t}</span>`).join('')}</div></div>`;
-    wrap.appendChild(div);
-  });
-}
-
-/* ── MONTHLY CALENDAR ── */
-const TAG_COLORS={
-  'EXAM':'#c04a4a',
-  'HOLIDAY/BREAK':'#4a8a6a',
-  'CURRICULUM':'#4a7fa5',
-  'WIN':'#7a5a92',
-  'ORIENTATION':'#9a7040',
-  'ACADEMIC TERM':'#9a8a40',
-  'BECOMING A PHYSICIAN':'#5a7a5a'
-};
-
-let calYear,calMonth;
-function initCal(){const t=new Date();calYear=t.getFullYear();calMonth=t.getMonth();}
-
-function shiftMonth(dir){
-  calMonth+=dir;
-  if(calMonth>11){calMonth=0;calYear++;}
-  if(calMonth<0){calMonth=11;calYear--;}
-  renderMonthCalendar();
-}
-
-function buildEventMap(){
-  const map={};
-  calendarEvents.forEach(e=>{
-    let cur=e.date;
-    const end=e.endDate||e.date;
-    while(cur<=end){
-      if(!map[cur])map[cur]=[];
-      map[cur].push(e);
-      cur=addDays(cur,1);
-    }
-  });
-  return map;
-}
-
-function renderMonthCalendar(){
-  const wrap=document.getElementById('cal-grid');wrap.innerHTML='';
-  // Day headers
-  ['S','M','T','W','T','F','S'].forEach(d=>{
-    const h=document.createElement('div');h.className='cal-day-hdr';h.textContent=d;wrap.appendChild(h);
-  });
-  const eventMap=buildEventMap();
-  const today=getTodayET();
-  const firstDay=new Date(calYear,calMonth,1);
-  const lastDay=new Date(calYear,calMonth+1,0).getDate();
-  const startDow=firstDay.getDay();
-  // prev month fill
-  const prevLast=new Date(calYear,calMonth,0).getDate();
-  for(let i=startDow-1;i>=0;i--){
-    const d=prevLast-i;
-    const m=calMonth===0?12:calMonth;
-    const y=calMonth===0?calYear-1:calYear;
-    wrap.appendChild(makeCalCell(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,d,true,eventMap,today));
-  }
-  // current month
-  for(let d=1;d<=lastDay;d++){
-    wrap.appendChild(makeCalCell(`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,d,false,eventMap,today));
-  }
-  // next month fill
-  const filled=startDow+lastDay;
-  const tail=filled%7===0?0:7-(filled%7);
-  for(let d=1;d<=tail;d++){
-    const m=calMonth===11?1:calMonth+2;
-    const y=calMonth===11?calYear+1:calYear;
-    wrap.appendChild(makeCalCell(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,d,true,eventMap,today));
-  }
-  document.getElementById('cal-month-title').textContent=firstDay.toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  // hide selected panel when month changes
-  document.getElementById('cal-selected-events').classList.remove('visible');
-}
-
-function makeCalCell(dateStr,dayNum,otherMonth,eventMap,today){
-  const events=eventMap[dateStr]||[];
-  const div=document.createElement('div');
-  div.className='cal-day'+(otherMonth?' other-month':'')+(dateStr===today?' today':'')+(events.some(e=>e.tags.includes('EXAM'))?' exam-day':'')+(events.length?' has-event':'');
-  const num=document.createElement('div');num.className='cal-day-num';num.textContent=dayNum;div.appendChild(num);
-  if(events.length){
-    const dots=document.createElement('div');dots.className='cal-dots';
-    const seen=new Set();
-    events.forEach(e=>{
-      const tag=e.tags[0]||'';
-      if(!seen.has(tag)&&seen.size<4){seen.add(tag);const dot=document.createElement('div');dot.className='cal-dot';dot.style.background=TAG_COLORS[tag]||'rgba(26,26,46,0.35)';dots.appendChild(dot);}
-    });
-    div.appendChild(dots);
-    div.title=events.map(e=>e.name).join('\n');
-    div.onclick=()=>showDayEvents(dateStr,events);
-  }
-  return div;
-}
-
-function showDayEvents(dateStr,events){
-  const panel=document.getElementById('cal-selected-events');
-  const title=document.getElementById('cal-sel-title');
-  const list=document.getElementById('cal-sel-list');
-  title.textContent=new Date(dateStr+'T12:00:00Z').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  list.innerHTML='';
-  events.forEach(e=>{
-    const div=document.createElement('div');div.className='cal-sel-item';
-    div.innerHTML=`<div class="cal-sel-dot" style="background:${TAG_COLORS[e.tags[0]]||'rgba(26,26,46,0.35)'}"></div><div class="cal-sel-name">${e.name}</div>`;
-    list.appendChild(div);
-  });
-  panel.classList.add('visible');
-}
-
-/* ── INIT ── */
-initCal();
-loadTB();
-renderWeekStrip();renderTimeBlocks();
-fetchNotionTasks();
-fetchCalendarEvents();
 </script>
 </body>
 </html>
