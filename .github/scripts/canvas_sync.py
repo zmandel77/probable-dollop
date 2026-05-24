@@ -3,11 +3,12 @@
 
 import os
 import sys
+import traceback
 import requests
 
-CANVAS_BASE  = "https://UMassmed.instructure.com/api/v1"
-CANVAS_TOKEN = os.environ["CANVAS_TOKEN"]
-NOTION_TOKEN = os.environ["NOTION_TOKEN"]
+CANVAS_BASE    = "https://umassmed.instructure.com/api/v1"
+CANVAS_TOKEN   = os.environ["CANVAS_TOKEN"]
+NOTION_TOKEN   = os.environ["NOTION_TOKEN"]
 ASSIGNMENTS_DB = "7a892195dc594a9e8e1057b22428669f"
 
 CANVAS_HDR = {"Authorization": f"Bearer {CANVAS_TOKEN}"}
@@ -27,6 +28,8 @@ def canvas_get(path, params=None):
     results = []
     while url:
         r = requests.get(url, headers=CANVAS_HDR, params=params, timeout=30)
+        if not r.ok:
+            print(f"  Canvas error {r.status_code}: {r.text[:500]}")
         r.raise_for_status()
         data = r.json()
         if isinstance(data, list):
@@ -34,7 +37,7 @@ def canvas_get(path, params=None):
         else:
             return data
         url = r.links.get("next", {}).get("url")
-        params = None  # only on first request
+        params = None
     return results
 
 
@@ -42,19 +45,19 @@ def canvas_get(path, params=None):
 # Notion helpers
 # ---------------------------------------------------------------------------
 
-def notion_query_all(filter_body=None):
+def notion_query_all():
     """Return all pages from the assignments DB."""
     results, cursor = [], None
     while True:
         body = {"page_size": 100}
-        if filter_body:
-            body["filter"] = filter_body
         if cursor:
             body["start_cursor"] = cursor
         r = requests.post(
             f"https://api.notion.com/v1/databases/{ASSIGNMENTS_DB}/query",
             headers=NOTION_HDR, json=body, timeout=30,
         )
+        if not r.ok:
+            print(f"  Notion query error {r.status_code}: {r.text[:500]}")
         r.raise_for_status()
         data = r.json()
         results.extend(data.get("results", []))
@@ -71,6 +74,8 @@ def notion_create(properties):
         json={"parent": {"database_id": ASSIGNMENTS_DB}, "properties": properties},
         timeout=30,
     )
+    if not r.ok:
+        print(f"  Notion create error {r.status_code}: {r.text[:500]}")
     r.raise_for_status()
     return r.json()
 
@@ -80,18 +85,29 @@ def notion_update(page_id, properties):
         f"https://api.notion.com/v1/pages/{page_id}",
         headers=NOTION_HDR, json={"properties": properties}, timeout=30,
     )
+    if not r.ok:
+        print(f"  Notion update error {r.status_code}: {r.text[:500]}")
     r.raise_for_status()
 
 
-def ensure_db_properties():
-    """Add any missing properties to the Notion DB schema."""
+def get_db_property_names():
+    """Return the set of property names currently in the DB."""
     r = requests.get(
         f"https://api.notion.com/v1/databases/{ASSIGNMENTS_DB}",
         headers=NOTION_HDR, timeout=30,
     )
-    r.raise_for_status()
-    existing = set(r.json()["properties"].keys())
+    if not r.ok:
+        print(f"  Notion DB fetch error {r.status_code}: {r.text[:500]}")
+        r.raise_for_status()
+    return set(r.json()["properties"].keys())
 
+
+def ensure_db_properties(existing):
+    """
+    Add missing properties to the Notion DB schema.
+    Non-fatal — if the integration lacks schema-edit permission we just
+    work with whatever properties already exist.
+    """
     needed = {
         "Canvas ID":        {"rich_text": {}},
         "Course":           {"select": {}},
@@ -105,13 +121,22 @@ def ensure_db_properties():
     }
     to_add = {k: v for k, v in needed.items() if k not in existing}
     if not to_add:
-        return
-    print(f"  Adding new Notion properties: {list(to_add.keys())}")
-    r = requests.patch(
-        f"https://api.notion.com/v1/databases/{ASSIGNMENTS_DB}",
-        headers=NOTION_HDR, json={"properties": to_add}, timeout=30,
-    )
-    r.raise_for_status()
+        return existing
+
+    print(f"  Adding new DB properties: {list(to_add.keys())}")
+    try:
+        r = requests.patch(
+            f"https://api.notion.com/v1/databases/{ASSIGNMENTS_DB}",
+            headers=NOTION_HDR, json={"properties": to_add}, timeout=30,
+        )
+        if not r.ok:
+            print(f"  Schema update failed ({r.status_code}): {r.text[:500]}")
+            print("  Continuing with existing properties only.")
+            return existing
+        return existing | set(to_add.keys())
+    except Exception as e:
+        print(f"  Schema update exception: {e} — continuing anyway.")
+        return existing
 
 
 # ---------------------------------------------------------------------------
@@ -128,37 +153,37 @@ def _num(val):
     return {"number": float(val)} if val is not None else {"number": None}
 
 
-def build_properties(asgn, course_name):
-    sub  = asgn.get("submission") or {}
-    wf   = sub.get("workflow_state", "unsubmitted")
+def build_properties(asgn, course_name, known_props):
+    """Build Notion property dict, skipping fields not in the DB schema."""
+    sub       = asgn.get("submission") or {}
+    wf        = sub.get("workflow_state", "unsubmitted")
     submitted = wf in ("submitted", "graded", "pending_review")
     graded    = wf == "graded"
     score     = sub.get("score")
     locked    = bool(asgn.get("locked_for_user", False))
-
     sub_types = asgn.get("submission_types") or []
     sub_type  = sub_types[0].replace("_", " ").title() if sub_types else "Assignment"
 
-    props = {
+    due = asgn.get("due_at")
+    url = asgn.get("html_url", "")
+
+    candidates = {
         "Name":             {"title": [{"text": {"content": asgn["name"][:2000]}}]},
+        "Due Date":         {"date": {"start": due[:10]}} if due else {"date": None},
         "Canvas ID":        _txt(asgn["id"]),
         "Course":           _select(course_name),
         "Points Possible":  _num(asgn.get("points_possible")),
+        "Score":            _num(score),
         "Submitted":        {"checkbox": submitted},
         "Graded":           {"checkbox": graded},
-        "Score":            _num(score),
         "Submission Type":  _select(sub_type),
         "Locked":           {"checkbox": locked},
     }
-
-    due = asgn.get("due_at")
-    props["Due Date"] = {"date": {"start": due[:10]}} if due else {"date": None}
-
-    url = asgn.get("html_url", "")
     if url:
-        props["Canvas URL"] = {"url": url}
+        candidates["Canvas URL"] = {"url": url}
 
-    return props
+    # Only send properties the DB actually has
+    return {k: v for k, v in candidates.items() if k in known_props}
 
 
 def get_canvas_id(page):
@@ -173,10 +198,13 @@ def get_canvas_id(page):
 # ---------------------------------------------------------------------------
 
 def sync():
-    print("Ensuring Notion DB schema is up to date...")
-    ensure_db_properties()
+    print("Fetching Notion DB schema...")
+    known_props = get_db_property_names()
+    print(f"  Existing properties: {sorted(known_props)}")
 
-    print("Fetching active Canvas courses...")
+    known_props = ensure_db_properties(known_props)
+
+    print("\nFetching active Canvas courses...")
     courses = canvas_get("/courses", params={
         "enrollment_state": "active",
         "enrollment_type[]": "student",
@@ -193,11 +221,7 @@ def sync():
         try:
             assignments = canvas_get(
                 f"/courses/{cid}/assignments",
-                params={
-                    "include[]": "submission",
-                    "per_page": 100,
-                    "order_by": "due_at",
-                },
+                params={"include[]": "submission", "per_page": 100, "order_by": "due_at"},
             )
             for a in assignments:
                 a["_course_name"] = cname
@@ -215,14 +239,14 @@ def sync():
     created = updated = errors = 0
     for asgn in all_assignments:
         canvas_id = str(asgn["id"])
-        props     = build_properties(asgn, asgn["_course_name"])
+        props     = build_properties(asgn, asgn["_course_name"], known_props)
         try:
             if canvas_id in by_canvas_id:
-                # Never overwrite the user's Status — only update everything else
                 notion_update(by_canvas_id[canvas_id]["id"], props)
                 updated += 1
             else:
-                props["Status"] = {"status": {"name": "Not started"}}
+                if "Status" in known_props:
+                    props["Status"] = {"status": {"name": "Not started"}}
                 notion_create(props)
                 created += 1
         except requests.HTTPError as e:
@@ -235,4 +259,8 @@ def sync():
 
 
 if __name__ == "__main__":
-    sync()
+    try:
+        sync()
+    except Exception:
+        traceback.print_exc()
+        sys.exit(1)
