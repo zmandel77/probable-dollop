@@ -7,8 +7,8 @@ import traceback
 import requests
 
 CANVAS_BASE    = "https://umassmed.instructure.com/api/v1"
-CANVAS_TOKEN   = os.environ["CANVAS_TOKEN"]
-NOTION_TOKEN   = os.environ["NOTION_TOKEN"]
+CANVAS_TOKEN   = os.environ["CANVAS_TOKEN"].strip()
+NOTION_TOKEN   = os.environ["NOTION_TOKEN"].strip()
 ASSIGNMENTS_DB = "7a892195dc594a9e8e1057b22428669f"
 
 CANVAS_HDR = {"Authorization": f"Bearer {CANVAS_TOKEN}"}
