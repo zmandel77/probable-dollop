@@ -128,6 +128,33 @@ body{
   .asgn-body{grid-template-columns:1fr;gap:.9rem 0;}
   .asgn-divider{display:none;}
 }
+
+/* ── CANVAS SYNC BUTTON ── */
+.canvas-sync-btn{
+  font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);background:none;
+  border:1px solid var(--div);border-radius:4px;padding:2px 8px;
+  cursor:pointer;transition:color .12s,border-color .12s;white-space:nowrap;
+}
+.canvas-sync-btn:hover{color:var(--ink);border-color:var(--ink3);}
+.canvas-sync-btn:disabled{opacity:.35;cursor:default;}
+.canvas-token-row{
+  display:none;align-items:center;gap:.5rem;
+  margin-bottom:.85rem;flex-wrap:wrap;
+}
+.canvas-token-input{
+  font-family:'Courier Prime',monospace;font-size:11px;flex:1;min-width:180px;
+  padding:.3rem .6rem;border:1px solid var(--div);border-radius:4px;
+  background:transparent;color:var(--ink);outline:none;
+}
+.canvas-token-input:focus{border-color:var(--ink3);}
+.canvas-token-save{
+  font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);background:none;
+  border:1px solid var(--div);border-radius:4px;padding:2px 8px;cursor:pointer;
+}
+.canvas-token-save:hover{color:var(--ink);}
+.canvas-token-hint{font-size:9px;color:var(--ink3);width:100%;}
 </style>
 </head>
 <body>
@@ -220,10 +247,19 @@ body{
   <div class="assignments">
     <div class="asgn-header">
       <span class="asgn-section-title">assignments</span>
-      <span class="asgn-sync">
-        <span class="asgn-sync-dot" id="asgn-dot"></span>
-        <span id="asgn-sync-msg">loading...</span>
-      </span>
+      <div style="display:flex;align-items:center;gap:.8rem;">
+        <span class="asgn-sync">
+          <span class="asgn-sync-dot" id="asgn-dot"></span>
+          <span id="asgn-sync-msg">loading...</span>
+        </span>
+        <button class="canvas-sync-btn" id="canvas-sync-btn" onclick="triggerCanvasSync()">↓ sync canvas</button>
+      </div>
+    </div>
+    <div class="canvas-token-row" id="canvas-token-row">
+      <input class="canvas-token-input" id="canvas-token-input" type="password" placeholder="paste canvas api token" autocomplete="off">
+      <button class="canvas-token-save" onclick="saveCanvasToken()">save & sync</button>
+      <button class="canvas-token-save" onclick="document.getElementById('canvas-token-row').style.display='none'">cancel</button>
+      <span class="canvas-token-hint">canvas → account → settings → new access token. saved locally, never leaves your browser.</span>
     </div>
     <div class="asgn-body">
       <div class="asgn-col">
@@ -551,6 +587,123 @@ async function fetchAssignments(){
 }
 
 fetchAssignments();
+
+/* ── CANVAS SYNC ── */
+const CANVAS_BASE      = 'https://umassmed.instructure.com/api/v1';
+const CANVAS_TOKEN_KEY = 'canvas_api_token_v1';
+
+async function canvasFetch(path, params={}){
+  const token=localStorage.getItem(CANVAS_TOKEN_KEY);
+  if(!token)throw new Error('no_token');
+  const p=new URLSearchParams({...params,access_token:token,per_page:'100'});
+  const url=CANVAS_BASE+path+'?'+p.toString();
+  const r=await fetch(NOTION_PROXY+encodeURIComponent(url));
+  const data=await r.json();
+  if(data&&data.errors)throw new Error(data.errors[0]?.message||'canvas_error');
+  return data;
+}
+
+function triggerCanvasSync(){
+  if(localStorage.getItem(CANVAS_TOKEN_KEY)){
+    runCanvasSync();
+  } else {
+    const row=document.getElementById('canvas-token-row');
+    row.style.display='flex';
+    document.getElementById('canvas-token-input').focus();
+  }
+}
+
+function saveCanvasToken(){
+  const val=document.getElementById('canvas-token-input').value.trim();
+  if(!val)return;
+  localStorage.setItem(CANVAS_TOKEN_KEY,val);
+  document.getElementById('canvas-token-row').style.display='none';
+  document.getElementById('canvas-token-input').value='';
+  runCanvasSync();
+}
+
+document.getElementById('canvas-token-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter')saveCanvasToken();
+  if(e.key==='Escape')document.getElementById('canvas-token-row').style.display='none';
+});
+
+async function runCanvasSync(){
+  const btn=document.getElementById('canvas-sync-btn');
+  btn.textContent='↓ syncing...';btn.disabled=true;
+  setAsgnSync('','syncing from canvas...');
+  try{
+    // Fetch courses
+    const courses=await canvasFetch('/courses',{
+      enrollment_state:'active','enrollment_type[]':'student','state[]':'available'
+    });
+    if(!Array.isArray(courses))throw new Error('canvas_error');
+
+    // Fetch assignments per course
+    const all=[];
+    for(const course of courses){
+      try{
+        const asgns=await canvasFetch(`/courses/${course.id}/assignments`,{'include[]':'submission',order_by:'due_at'});
+        if(Array.isArray(asgns)){
+          const cname=course.name||course.course_code||`Course ${course.id}`;
+          asgns.forEach(a=>{a._course=cname;});
+          all.push(...asgns);
+        }
+      }catch(e){/* skip failed course */}
+    }
+
+    // Load existing Notion pages indexed by Canvas ID
+    const existing=await notionAPI('databases/'+ASSIGNMENTS_DB+'/query','POST',{page_size:100});
+    const byCanvasId={};
+    (existing.results||[]).forEach(p=>{
+      const cid=p.properties['Canvas ID']?.rich_text?.[0]?.plain_text;
+      if(cid)byCanvasId[cid]=p.id;
+    });
+
+    let created=0,updated=0;
+    for(const asgn of all){
+      const cid=String(asgn.id);
+      const sub=asgn.submission||{};
+      const wf=sub.workflow_state||'unsubmitted';
+      const due=asgn.due_at?asgn.due_at.slice(0,10):null;
+      const props={
+        'Name':          {title:[{text:{content:asgn.name.slice(0,2000)}}]},
+        'Canvas ID':     {rich_text:[{text:{content:cid}}]},
+        'Course':        {select:{name:asgn._course.slice(0,100)}},
+        'Due Date':      due?{date:{start:due}}:{date:null},
+        'Submitted':     {checkbox:['submitted','graded','pending_review'].includes(wf)},
+        'Graded':        {checkbox:wf==='graded'},
+      };
+      if(asgn.points_possible!=null)props['Points Possible']={number:asgn.points_possible};
+      if(sub.score!=null)props['Score']={number:sub.score};
+      if(asgn.html_url)props['Canvas URL']={url:asgn.html_url};
+      try{
+        if(cid in byCanvasId){
+          await notionAPI('pages/'+byCanvasId[cid],'PATCH',{properties:props});
+          updated++;
+        } else {
+          props['Status']={status:{name:'Not started'}};
+          await notionAPI('pages','POST',{parent:{database_id:ASSIGNMENTS_DB},properties:props});
+          created++;
+        }
+      }catch(e){/* skip failed page */}
+    }
+
+    setAsgnSync('live',`canvas synced · ${created} new, ${updated} updated`);
+    setTimeout(fetchAssignments,800);
+
+  }catch(e){
+    if(e.message==='no_token'){
+      document.getElementById('canvas-token-row').style.display='flex';
+    } else if(e.message.toLowerCase().includes('invalid')||e.message.includes('401')){
+      localStorage.removeItem(CANVAS_TOKEN_KEY);
+      setAsgnSync('error','token invalid — click sync to re-enter');
+    } else {
+      setAsgnSync('error','canvas sync failed');
+    }
+    console.warn('Canvas sync error',e);
+  }
+  btn.textContent='↓ sync canvas';btn.disabled=false;
+}
 </script>
 </body>
 </html>
