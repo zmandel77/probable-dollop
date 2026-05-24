@@ -85,6 +85,49 @@ body{
   .stat{padding:0 .9rem 0 0;margin-right:.9rem;}
   .stat-value{font-size:15px;}
 }
+
+/* ── ASSIGNMENTS ── */
+.assignments{
+  border-top:1px solid var(--div);
+  padding-top:1.2rem;
+}
+.asgn-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1rem;
+}
+.asgn-section-title{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);}
+.asgn-sync{display:flex;align-items:center;gap:.35rem;font-size:9px;color:var(--ink3);}
+.asgn-sync-dot{width:5px;height:5px;border-radius:50%;background:var(--ink3);}
+.asgn-sync-dot.live{background:#6a9a7a;animation:asgnpulse 2s ease-in-out infinite;}
+.asgn-sync-dot.error{background:#c04a4a;}
+@keyframes asgnpulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.asgn-body{
+  display:grid;
+  grid-template-columns:1fr 1px 1fr 1px 1fr;
+  gap:0 1.6rem;
+}
+.asgn-divider{background:var(--div);}
+.asgn-col-label{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:.55rem;}
+.asgn-list{display:flex;flex-direction:column;gap:.3rem;}
+.asgn-item{
+  display:flex;align-items:flex-start;gap:.5rem;
+  cursor:pointer;padding:.15rem 0;
+  transition:opacity .12s;
+  user-select:none;
+}
+.asgn-item:hover{opacity:.65;}
+.asgn-status{width:13px;height:13px;flex-shrink:0;margin-top:2px;color:var(--ink2);}
+.asgn-status.done{color:var(--ink3);}
+.asgn-info{flex:1;min-width:0;}
+.asgn-name{font-size:12px;color:var(--ink);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.asgn-name.done{text-decoration:line-through;color:var(--ink3);}
+.asgn-due{font-size:10px;color:var(--ink3);margin-top:1px;}
+.asgn-due.overdue{color:#b04040;}
+.asgn-empty{font-size:11px;color:var(--ink3);font-style:italic;}
+@media(max-width:700px){
+  .asgn-body{grid-template-columns:1fr;gap:.9rem 0;}
+  .asgn-divider{display:none;}
+}
 </style>
 </head>
 <body>
@@ -172,6 +215,34 @@ body{
     </div>
 
   </div>
+
+  <!-- Assignments -->
+  <div class="assignments">
+    <div class="asgn-header">
+      <span class="asgn-section-title">assignments</span>
+      <span class="asgn-sync">
+        <span class="asgn-sync-dot" id="asgn-dot"></span>
+        <span id="asgn-sync-msg">loading...</span>
+      </span>
+    </div>
+    <div class="asgn-body">
+      <div class="asgn-col">
+        <div class="asgn-col-label">not started</div>
+        <div class="asgn-list" id="asgn-not-started"></div>
+      </div>
+      <div class="asgn-divider"></div>
+      <div class="asgn-col">
+        <div class="asgn-col-label">in progress</div>
+        <div class="asgn-list" id="asgn-in-progress"></div>
+      </div>
+      <div class="asgn-divider"></div>
+      <div class="asgn-col">
+        <div class="asgn-col-label">done</div>
+        <div class="asgn-list" id="asgn-done"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -348,6 +419,138 @@ fetch(API).then(r=>r.json()).then(d=>{
   drawMoon(document.getElementById('moon-icon'),phase);
   document.getElementById('moon-name').textContent=moonPhaseName(phase);
 })();
+
+/* ── NOTION / ASSIGNMENTS ── */
+const NOTION_TOKEN   ='ntn_b9621396454auHpstnIGoBQlq2gScDaXg3Bkq3oKIB9d6j';
+const ASSIGNMENTS_DB ='7a892195dc594a9e8e1057b22428669f';
+const NOTION_PROXY   ='https://api.allorigins.win/raw?url=';
+
+async function notionAPI(endpoint,method='GET',body=null){
+  const url=NOTION_PROXY+encodeURIComponent('https://api.notion.com/v1/'+endpoint);
+  const opts={method,headers:{'Authorization':'Bearer '+NOTION_TOKEN,'Notion-Version':'2022-06-28','Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);
+  return r.json();
+}
+
+let assignments=[];
+
+function fmtDue(iso){
+  if(!iso)return'';
+  const [,m,d]=iso.split('-');
+  return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m,10)-1]+' '+parseInt(d,10);
+}
+
+function statusIcon(status){
+  const NS='http://www.w3.org/2000/svg';
+  const s=document.createElementNS(NS,'svg');
+  s.setAttribute('viewBox','0 0 13 13');
+  s.setAttribute('fill','none');
+  s.setAttribute('width','13');s.setAttribute('height','13');
+  if(status==='Not started'){
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx','6.5');c.setAttribute('cy','6.5');c.setAttribute('r','5.2');
+    c.setAttribute('stroke','currentColor');c.setAttribute('stroke-width','1.4');
+    s.appendChild(c);
+  } else if(status==='In progress'){
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx','6.5');c.setAttribute('cy','6.5');c.setAttribute('r','5.2');
+    c.setAttribute('stroke','currentColor');c.setAttribute('stroke-width','1.4');
+    const p=document.createElementNS(NS,'path');
+    p.setAttribute('d','M6.5 1.3 A5.2 5.2 0 0 1 6.5 11.7 Z');
+    p.setAttribute('fill','currentColor');
+    s.appendChild(c);s.appendChild(p);
+  } else {
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx','6.5');c.setAttribute('cy','6.5');c.setAttribute('r','5.2');
+    c.setAttribute('fill','currentColor');
+    const p=document.createElementNS(NS,'path');
+    p.setAttribute('d','M4 6.5l2 2 3.2-3.2');
+    p.setAttribute('stroke','white');p.setAttribute('stroke-width','1.3');
+    p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');
+    s.appendChild(c);s.appendChild(p);
+  }
+  return s;
+}
+
+function nextStatus(s){
+  if(s==='Not started')return'In progress';
+  if(s==='In progress')return'Done';
+  return'Not started';
+}
+
+function setAsgnSync(state,msg){
+  document.getElementById('asgn-dot').className='asgn-sync-dot'+(state==='live'?' live':state==='error'?' error':'');
+  document.getElementById('asgn-sync-msg').textContent=msg;
+}
+
+function renderAssignments(){
+  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());
+  const groups={'Not started':[],'In progress':[],'Done':[]};
+  assignments.forEach(a=>{(groups[a.status]??groups['Not started']).push(a);});
+
+  [['not-started','Not started'],['in-progress','In progress'],['done','Done']].forEach(([id,key])=>{
+    const wrap=document.getElementById('asgn-'+id);
+    wrap.innerHTML='';
+    const list=groups[key];
+    if(!list.length){wrap.innerHTML='<div class="asgn-empty">—</div>';return;}
+    list.forEach(a=>{
+      const overdue=a.due&&a.due<today&&a.status!=='Done';
+      const div=document.createElement('div');
+      div.className='asgn-item';
+      const statusEl=statusIcon(a.status);
+      statusEl.classList.add(...['asgn-status',...(a.status==='Done'?['done']:[])]);
+      const info=document.createElement('div');
+      info.className='asgn-info';
+      info.innerHTML=`<div class="asgn-name${a.status==='Done'?' done':''}">${a.name}</div>${a.due?`<div class="asgn-due${overdue?' overdue':''}">${fmtDue(a.due)}</div>`:''}`;
+      div.appendChild(statusEl);div.appendChild(info);
+      div.onclick=()=>cycleStatus(a);
+      wrap.appendChild(div);
+    });
+  });
+}
+
+async function cycleStatus(asgn){
+  const prev=asgn.status;
+  asgn.status=nextStatus(prev);
+  renderAssignments();
+  try{
+    await notionAPI('pages/'+asgn.id,'PATCH',{properties:{'Status':{status:{name:asgn.status}}}});
+  }catch(e){
+    asgn.status=prev;
+    renderAssignments();
+    setAsgnSync('error','sync failed');
+    console.warn('Status patch failed',e);
+  }
+}
+
+async function fetchAssignments(){
+  setAsgnSync('','loading...');
+  try{
+    const data=await notionAPI('databases/'+ASSIGNMENTS_DB+'/query','POST',{
+      page_size:50,
+      sorts:[{property:'Status',direction:'ascending'},{property:'Due Date',direction:'ascending'}]
+    });
+    if(data.results){
+      assignments=data.results.map(p=>{
+        const pr=p.properties;
+        return{
+          id:p.id,
+          name:pr['Name']?.title?.[0]?.plain_text||'Untitled',
+          due:pr['Due Date']?.date?.start?.slice(0,10)||null,
+          status:pr['Status']?.status?.name||'Not started'
+        };
+      });
+    }
+    setAsgnSync('live','synced from notion');
+  }catch(e){
+    setAsgnSync('error','unavailable');
+    console.warn('Assignments fetch failed',e);
+  }
+  renderAssignments();
+}
+
+fetchAssignments();
 </script>
 </body>
 </html>
