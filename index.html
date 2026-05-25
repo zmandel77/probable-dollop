@@ -15,6 +15,15 @@
   --ink3:#a8998a;
   --div:rgba(42,35,24,0.1);
 }
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1612;
+    --ink:#e0d4c4;
+    --ink2:#a89880;
+    --ink3:#6a5f50;
+    --div:rgba(224,212,196,0.1);
+  }
+}
 body{
   min-height:100vh;
   background:var(--bg);
@@ -42,7 +51,6 @@ body{
 .vdiv{width:1px;align-self:stretch;background:var(--div);flex-shrink:0;}
 
 .wx-main{display:flex;align-items:center;gap:1.2rem;flex:1;min-width:200px;}
-.wx-text{}
 .wx-temp{font-size:52px;font-weight:700;color:var(--ink);letter-spacing:-.02em;display:block;line-height:1;}
 .wx-desc{font-size:12px;color:var(--ink2);font-style:italic;margin-top:.25rem;}
 .wx-feels{font-size:11px;color:var(--ink3);margin-top:.1rem;letter-spacing:.02em;}
@@ -85,76 +93,6 @@ body{
   .stat{padding:0 .9rem 0 0;margin-right:.9rem;}
   .stat-value{font-size:15px;}
 }
-
-/* ── ASSIGNMENTS ── */
-.assignments{
-  border-top:1px solid var(--div);
-  padding-top:1.2rem;
-}
-.asgn-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:1rem;
-}
-.asgn-section-title{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);}
-.asgn-sync{display:flex;align-items:center;gap:.35rem;font-size:9px;color:var(--ink3);}
-.asgn-sync-dot{width:5px;height:5px;border-radius:50%;background:var(--ink3);}
-.asgn-sync-dot.live{background:#6a9a7a;animation:asgnpulse 2s ease-in-out infinite;}
-.asgn-sync-dot.error{background:#c04a4a;}
-@keyframes asgnpulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.asgn-body{
-  display:grid;
-  grid-template-columns:1fr 1px 1fr 1px 1fr;
-  gap:0 1.6rem;
-}
-.asgn-divider{background:var(--div);}
-.asgn-col-label{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:.55rem;}
-.asgn-list{display:flex;flex-direction:column;gap:.3rem;}
-.asgn-item{
-  display:flex;align-items:flex-start;gap:.5rem;
-  cursor:pointer;padding:.15rem 0;
-  transition:opacity .12s;
-  user-select:none;
-}
-.asgn-item:hover{opacity:.65;}
-.asgn-status{width:13px;height:13px;flex-shrink:0;margin-top:2px;color:var(--ink2);}
-.asgn-status.done{color:var(--ink3);}
-.asgn-info{flex:1;min-width:0;}
-.asgn-name{font-size:12px;color:var(--ink);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.asgn-name.done{text-decoration:line-through;color:var(--ink3);}
-.asgn-due{font-size:10px;color:var(--ink3);margin-top:1px;}
-.asgn-due.overdue{color:#b04040;}
-.asgn-empty{font-size:11px;color:var(--ink3);font-style:italic;}
-@media(max-width:700px){
-  .asgn-body{grid-template-columns:1fr;gap:.9rem 0;}
-  .asgn-divider{display:none;}
-}
-
-/* ── CANVAS SYNC BUTTON ── */
-.canvas-sync-btn{
-  font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--ink3);background:none;
-  border:1px solid var(--div);border-radius:4px;padding:2px 8px;
-  cursor:pointer;transition:color .12s,border-color .12s;white-space:nowrap;
-}
-.canvas-sync-btn:hover{color:var(--ink);border-color:var(--ink3);}
-.canvas-sync-btn:disabled{opacity:.35;cursor:default;}
-.canvas-token-row{
-  display:none;align-items:center;gap:.5rem;
-  margin-bottom:.85rem;flex-wrap:wrap;
-}
-.canvas-token-input{
-  font-family:'Courier Prime',monospace;font-size:11px;flex:1;min-width:180px;
-  padding:.3rem .6rem;border:1px solid var(--div);border-radius:4px;
-  background:transparent;color:var(--ink);outline:none;
-}
-.canvas-token-input:focus{border-color:var(--ink3);}
-.canvas-token-save{
-  font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--ink3);background:none;
-  border:1px solid var(--div);border-radius:4px;padding:2px 8px;cursor:pointer;
-}
-.canvas-token-save:hover{color:var(--ink);}
-.canvas-token-hint{font-size:9px;color:var(--ink3);width:100%;}
 </style>
 </head>
 <body>
@@ -191,25 +129,21 @@ body{
 
   <!-- Stats strip -->
   <div class="stats">
-
     <div class="stat">
       <div class="stat-label">high / low</div>
       <div class="stat-value" id="stat-hilo">— / —</div>
       <div class="stat-sub" id="stat-feels-range"></div>
     </div>
-
     <div class="stat">
       <div class="stat-label">precipitation</div>
       <div class="stat-value" id="stat-precip">—%</div>
       <div class="stat-sub" id="stat-precip-sub"></div>
     </div>
-
     <div class="stat">
       <div class="stat-label">humidity</div>
       <div class="stat-value" id="stat-humidity">—%</div>
       <div class="stat-sub">relative</div>
     </div>
-
     <div class="stat">
       <div class="stat-label">uv index</div>
       <div class="stat-value" id="stat-uv">—</div>
@@ -218,13 +152,11 @@ body{
         <span class="stat-sub" id="stat-uv-label"></span>
       </div>
     </div>
-
     <div class="stat">
       <div class="stat-label">wind</div>
       <div class="stat-value" id="stat-wind">—</div>
       <div class="stat-sub" id="stat-wind-dir"></div>
     </div>
-
     <div class="stat">
       <div class="stat-label">sun</div>
       <div class="sun-times">
@@ -238,43 +170,6 @@ body{
           <span id="stat-sunset">—</span>
           <span class="sun-lbl">set</span>
         </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Assignments -->
-  <div class="assignments">
-    <div class="asgn-header">
-      <span class="asgn-section-title">assignments</span>
-      <div style="display:flex;align-items:center;gap:.8rem;">
-        <span class="asgn-sync">
-          <span class="asgn-sync-dot" id="asgn-dot"></span>
-          <span id="asgn-sync-msg">loading...</span>
-        </span>
-        <button class="canvas-sync-btn" id="canvas-sync-btn" onclick="triggerCanvasSync()">↓ sync canvas</button>
-      </div>
-    </div>
-    <div class="canvas-token-row" id="canvas-token-row">
-      <input class="canvas-token-input" id="canvas-token-input" type="password" placeholder="paste canvas api token" autocomplete="off">
-      <button class="canvas-token-save" onclick="saveCanvasToken()">save & sync</button>
-      <button class="canvas-token-save" onclick="document.getElementById('canvas-token-row').style.display='none'">cancel</button>
-      <span class="canvas-token-hint">canvas → account → settings → new access token. saved locally, never leaves your browser.</span>
-    </div>
-    <div class="asgn-body">
-      <div class="asgn-col">
-        <div class="asgn-col-label">not started</div>
-        <div class="asgn-list" id="asgn-not-started"></div>
-      </div>
-      <div class="asgn-divider"></div>
-      <div class="asgn-col">
-        <div class="asgn-col-label">in progress</div>
-        <div class="asgn-list" id="asgn-in-progress"></div>
-      </div>
-      <div class="asgn-divider"></div>
-      <div class="asgn-col">
-        <div class="asgn-col-label">done</div>
-        <div class="asgn-list" id="asgn-done"></div>
       </div>
     </div>
   </div>
@@ -293,9 +188,17 @@ function tick(){
 }
 tick();setInterval(tick,1000);
 
+/* ── DARK MODE ── */
+const darkMQ=window.matchMedia('(prefers-color-scheme:dark)');
+function getColors(){
+  return darkMQ.matches
+    ?{INK:'#c8b8a0',INKL:'#8a7f70',BG:'#1a1612'}
+    :{INK:'#4a3f30',INKL:'#8a7f70',BG:'#ffffff'};
+}
+
 /* ── MOON PHASE ── */
 function getMoonPhase(date){
-  const known=new Date(2000,0,6,18,14,0); // known new moon
+  const known=new Date(2000,0,6,18,14,0);
   const days=(date-known)/(864e5);
   return(((days%29.53058770576)+29.53058770576)%29.53058770576)/29.53058770576;
 }
@@ -310,39 +213,30 @@ function moonPhaseName(p){
   return'Waning Crescent';
 }
 function drawMoon(svg,phase){
+  const{INK,BG}=getColors();
   svg.innerHTML='';
-  const r=18,cx=24,cy=24,BG='#ffffff',INK='#4a3f30';
-  // Outer glow ring
+  const r=18,cx=24,cy=24;
   svg.appendChild(el('circle',{cx,cy,r:r+1,fill:'none',stroke:'rgba(74,63,48,0.12)','stroke-width':'2'}));
-  // Moon disk
   svg.appendChild(el('circle',{cx,cy,r,fill:INK,opacity:'0.88'}));
   if(phase<0.02||phase>0.98){
-    // New moon: cover entirely
     svg.appendChild(el('circle',{cx,cy,r,fill:BG}));
     svg.appendChild(el('circle',{cx,cy,r:r-1,fill:'none',stroke:'rgba(74,63,48,0.25)','stroke-width':'1'}));
-  } else if(phase>0.48&&phase<0.52){
-    // Full moon: fully lit, done
-  } else {
+  }else if(!(phase>0.48&&phase<0.52)){
     const ex=Math.abs(Math.cos(phase*2*Math.PI))*r;
     const waxing=phase<0.5;
-    let d;
-    if(waxing){
-      // Shadow on left side
-      d=`M ${cx} ${cy-r} A ${r} ${r} 0 0 0 ${cx} ${cy+r} A ${ex} ${r} 0 0 1 ${cx} ${cy-r} Z`;
-    } else {
-      // Shadow on right side
-      d=`M ${cx} ${cy-r} A ${r} ${r} 0 0 1 ${cx} ${cy+r} A ${ex} ${r} 0 0 0 ${cx} ${cy-r} Z`;
-    }
+    const d=waxing
+      ?`M ${cx} ${cy-r} A ${r} ${r} 0 0 0 ${cx} ${cy+r} A ${ex} ${r} 0 0 1 ${cx} ${cy-r} Z`
+      :`M ${cx} ${cy-r} A ${r} ${r} 0 0 1 ${cx} ${cy+r} A ${ex} ${r} 0 0 0 ${cx} ${cy-r} Z`;
     svg.appendChild(el('path',{d,fill:BG}));
   }
 }
 
 /* ── WEATHER ICONS ── */
 const NS='http://www.w3.org/2000/svg';
-const INK='#4a3f30',INKL='#8a7f70';
 function el(tag,a){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);return e;}
 function anim(e,attr,vals,dur,delay){const a=el('animate',{attributeName:attr,values:vals,dur:dur+'s',begin:(delay||0)+'s',repeatCount:'indefinite',calcMode:'easeInOut'});e.appendChild(a);return e;}
 function cloud(svg,cx,cy,op){
+  const{INK}=getColors();
   const g=el('g',{opacity:op});
   g.appendChild(el('ellipse',{cx,cy,rx:'16',ry:'9',fill:INK}));
   g.appendChild(el('ellipse',{cx:cx-11,cy:cy+4,rx:'10',ry:'8',fill:INK}));
@@ -358,28 +252,29 @@ function wxType(code,night){
   if(code>=80&&code<=82)return'rain';if(code>=95)return'thunder';return'cloudy';
 }
 function drawIcon(svg,code,night){
+  const{INK,INKL}=getColors();
   svg.innerHTML='';
   const type=wxType(code,night),cx=36,cy=36;
   if(type==='night'){
     const m=el('path',{d:'M44 22 A16 16 0 1 0 44 50 A12 12 0 1 1 44 22',fill:INK,opacity:'0.85'});
     anim(m,'opacity','0.85;0.6;0.85',4,0);svg.appendChild(m);
     [[14,14],[58,10],[10,52],[60,50],[20,38]].forEach(([x,y])=>{const s=el('circle',{cx:x,cy:y,r:'1.3',fill:INKL,opacity:'0'});anim(s,'opacity','0;0.7;0',2.5,Math.random()*2);svg.appendChild(s);});
-  } else if(type==='clear'){
+  }else if(type==='clear'){
     const sun=el('circle',{cx,cy,r:'13',fill:INK,opacity:'0.9'});anim(sun,'r','13;15;13',4,0);svg.appendChild(sun);
-    [0,45,90,135,180,225,270,315].forEach((a,i)=>{const r=a*Math.PI/180;const ray=el('line',{x1:cx+18*Math.cos(r),y1:cy+18*Math.sin(r),x2:cx+24*Math.cos(r),y2:cy+24*Math.sin(r),stroke:INK,'stroke-width':'2','stroke-linecap':'round'});anim(ray,'opacity','0.8;0.2;0.8',3.5,i*0.4);svg.appendChild(ray);});
-  } else if(type==='partly'){
+    [0,45,90,135,180,225,270,315].forEach((a,i)=>{const rad=a*Math.PI/180;const ray=el('line',{x1:cx+18*Math.cos(rad),y1:cy+18*Math.sin(rad),x2:cx+24*Math.cos(rad),y2:cy+24*Math.sin(rad),stroke:INK,'stroke-width':'2','stroke-linecap':'round'});anim(ray,'opacity','0.8;0.2;0.8',3.5,i*0.4);svg.appendChild(ray);});
+  }else if(type==='partly'){
     const sun=el('circle',{cx:24,cy:26,r:'10',fill:INKL,opacity:'0.7'});anim(sun,'cy','26;23;26',3.5,0);svg.appendChild(sun);cloud(svg,40,46,1);
-  } else if(type==='cloudy'){
+  }else if(type==='cloudy'){
     cloud(svg,36,38,0.4);cloud(svg,36,48,1);
-  } else if(type==='rain'){
+  }else if(type==='rain'){
     cloud(svg,36,38,1);
     [[26,52,0],[34,57,0.3],[42,52,0.6],[30,62,0.9]].forEach(([x,y,d])=>{const ln=el('line',{x1:x,y1:y,x2:x-4,y2:y+8,stroke:INKL,'stroke-width':'1.4','stroke-linecap':'round',opacity:'0'});anim(ln,'opacity','0;0.8;0',1.1,d);svg.appendChild(ln);});
-  } else if(type==='snow'){
+  }else if(type==='snow'){
     cloud(svg,36,38,1);
-    [[26,54,0],[36,59,0.5],[46,54,1]].forEach(([x,y,d])=>{const g=el('g');[0,60,120].forEach(a=>{const r=a*Math.PI/180;g.appendChild(el('line',{x1:x-5*Math.cos(r),y1:y-5*Math.sin(r),x2:x+5*Math.cos(r),y2:y+5*Math.sin(r),stroke:INKL,'stroke-width':'1.2','stroke-linecap':'round'}));});anim(g,'opacity','0;0.9;0',2,d);svg.appendChild(g);});
-  } else if(type==='fog'){
+    [[26,54,0],[36,59,0.5],[46,54,1]].forEach(([x,y,d])=>{const g=el('g');[0,60,120].forEach(a=>{const rad=a*Math.PI/180;g.appendChild(el('line',{x1:x-5*Math.cos(rad),y1:y-5*Math.sin(rad),x2:x+5*Math.cos(rad),y2:y+5*Math.sin(rad),stroke:INKL,'stroke-width':'1.2','stroke-linecap':'round'}));});anim(g,'opacity','0;0.9;0',2,d);svg.appendChild(g);});
+  }else if(type==='fog'){
     [[8,28,52,0],[8,36,44,0.4],[8,44,50,0.8],[8,52,38,1.2]].forEach(([x,y,w,d])=>{const ln=el('line',{x1:x,y1:y,x2:x+w,y2:y,stroke:INKL,'stroke-width':'2.2','stroke-linecap':'round',opacity:'0.5'});anim(ln,'opacity','0.5;0.15;0.5',3.5,d);svg.appendChild(ln);});
-  } else if(type==='thunder'){
+  }else if(type==='thunder'){
     cloud(svg,36,36,1);
     const bolt=el('polygon',{points:'40,16 32,33 38,33 28,56 48,30 40,30 48,16',fill:INK,opacity:'0'});
     anim(bolt,'opacity','0;0;0;1;0.7;0;0;0;0.9;0',3.5,0);svg.appendChild(bolt);
@@ -392,315 +287,62 @@ function degToCard(d){const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S',
 function uvLabel(u){if(u<=2)return'Low';if(u<=5)return'Moderate';if(u<=7)return'High';if(u<=10)return'Very High';return'Extreme';}
 function fmtSunTime(iso){
   if(!iso)return'—';
-  // Open-Meteo returns times already in the requested timezone (America/New_York)
-  // Parse directly from the string to avoid browser-local re-interpretation
-  const [,time]=iso.split('T');
-  const [h,m]=time.split(':').map(Number);
-  const ampm=h>=12?'pm':'am';
-  return`${h%12||12}:${String(m).padStart(2,'0')} ${ampm}`;
+  const[,time]=iso.split('T');
+  const[h,m]=time.split(':').map(Number);
+  return`${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'pm':'am'}`;
 }
 
-/* ── FETCH ── */
+/* ── WEATHER FETCH ── */
 const API='https://api.open-meteo.com/v1/forecast'
   +'?latitude=42.2626&longitude=-71.8023'
   +'&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability,weather_code,is_day,wind_speed_10m,wind_direction_10m'
   +'&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,uv_index_max,sunrise,sunset,precipitation_probability_max,precipitation_sum'
   +'&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=1';
 
-fetch(API).then(r=>r.json()).then(d=>{
-  const c=d.current, dy=d.daily;
+let lastWxCode=null,lastIsDay=1;
 
-  // Current
+fetch(API).then(r=>r.json()).then(d=>{
+  const c=d.current,dy=d.daily;
+  lastWxCode=c.weather_code;lastIsDay=c.is_day;
+
   document.getElementById('wx-temp').textContent=Math.round(c.temperature_2m)+'°F';
   document.getElementById('wx-desc').textContent=WX_CODES[c.weather_code]||'';
   document.getElementById('wx-feels').textContent='feels like '+Math.round(c.apparent_temperature)+'°F';
   drawIcon(document.getElementById('wx-icon'),c.weather_code,c.is_day===0);
 
-  // High / Low
-  document.getElementById('stat-hilo').textContent=
-    Math.round(dy.temperature_2m_max[0])+'° / '+Math.round(dy.temperature_2m_min[0])+'°';
-  document.getElementById('stat-feels-range').textContent=
-    'feels '+Math.round(dy.apparent_temperature_max[0])+'° / '+Math.round(dy.apparent_temperature_min[0])+'°';
+  document.getElementById('stat-hilo').textContent=Math.round(dy.temperature_2m_max[0])+'° / '+Math.round(dy.temperature_2m_min[0])+'°';
+  document.getElementById('stat-feels-range').textContent='feels '+Math.round(dy.apparent_temperature_max[0])+'° / '+Math.round(dy.apparent_temperature_min[0])+'°';
 
-  // Precipitation
   const pct=dy.precipitation_probability_max[0]??c.precipitation_probability??0;
   const sum=dy.precipitation_sum[0]||0;
   document.getElementById('stat-precip').textContent=pct+'%';
   document.getElementById('stat-precip-sub').textContent=sum>0?sum.toFixed(2)+' in expected':'no rain expected';
 
-  // Humidity
   document.getElementById('stat-humidity').textContent=c.relative_humidity_2m+'%';
 
-  // UV
   const uv=Math.round(dy.uv_index_max[0]||0);
   document.getElementById('stat-uv').textContent=uv;
   document.getElementById('stat-uv-label').textContent=uvLabel(uv);
   document.getElementById('uv-dot').style.left=Math.min(uv/13*100,100)+'%';
 
-  // Wind
   document.getElementById('stat-wind').textContent=Math.round(c.wind_speed_10m)+' mph';
   document.getElementById('stat-wind-dir').textContent=degToCard(c.wind_direction_10m);
-
-  // Sunrise / Sunset
   document.getElementById('stat-sunrise').textContent=fmtSunTime(dy.sunrise[0]);
   document.getElementById('stat-sunset').textContent=fmtSunTime(dy.sunset[0]);
-
 }).catch(()=>{
   document.getElementById('wx-desc').textContent='weather unavailable';
 });
 
-/* Moon */
-(function(){
-  const phase=getMoonPhase(new Date());
-  drawMoon(document.getElementById('moon-icon'),phase);
-  document.getElementById('moon-name').textContent=moonPhaseName(phase);
-})();
+/* ── MOON ── */
+const moonPhase=getMoonPhase(new Date());
+drawMoon(document.getElementById('moon-icon'),moonPhase);
+document.getElementById('moon-name').textContent=moonPhaseName(moonPhase);
 
-/* ── NOTION / ASSIGNMENTS ── */
-const NOTION_TOKEN   ='ntn_b9621396454auHpstnIGoBQlq2gScDaXg3Bkq3oKIB9d6j';
-const ASSIGNMENTS_DB ='7a892195dc594a9e8e1057b22428669f';
-const NOTION_PROXY   ='https://api.allorigins.win/raw?url=';
-
-async function notionAPI(endpoint,method='GET',body=null){
-  const url=NOTION_PROXY+encodeURIComponent('https://api.notion.com/v1/'+endpoint);
-  const opts={method,headers:{'Authorization':'Bearer '+NOTION_TOKEN,'Notion-Version':'2022-06-28','Content-Type':'application/json'}};
-  if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(url,opts);
-  return r.json();
-}
-
-let assignments=[];
-
-function fmtDue(iso){
-  if(!iso)return'';
-  const [,m,d]=iso.split('-');
-  return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m,10)-1]+' '+parseInt(d,10);
-}
-
-function statusIcon(status){
-  const NS='http://www.w3.org/2000/svg';
-  const s=document.createElementNS(NS,'svg');
-  s.setAttribute('viewBox','0 0 13 13');
-  s.setAttribute('fill','none');
-  s.setAttribute('width','13');s.setAttribute('height','13');
-  if(status==='Not started'){
-    const c=document.createElementNS(NS,'circle');
-    c.setAttribute('cx','6.5');c.setAttribute('cy','6.5');c.setAttribute('r','5.2');
-    c.setAttribute('stroke','currentColor');c.setAttribute('stroke-width','1.4');
-    s.appendChild(c);
-  } else if(status==='In progress'){
-    const c=document.createElementNS(NS,'circle');
-    c.setAttribute('cx','6.5');c.setAttribute('cy','6.5');c.setAttribute('r','5.2');
-    c.setAttribute('stroke','currentColor');c.setAttribute('stroke-width','1.4');
-    const p=document.createElementNS(NS,'path');
-    p.setAttribute('d','M6.5 1.3 A5.2 5.2 0 0 1 6.5 11.7 Z');
-    p.setAttribute('fill','currentColor');
-    s.appendChild(c);s.appendChild(p);
-  } else {
-    const c=document.createElementNS(NS,'circle');
-    c.setAttribute('cx','6.5');c.setAttribute('cy','6.5');c.setAttribute('r','5.2');
-    c.setAttribute('fill','currentColor');
-    const p=document.createElementNS(NS,'path');
-    p.setAttribute('d','M4 6.5l2 2 3.2-3.2');
-    p.setAttribute('stroke','white');p.setAttribute('stroke-width','1.3');
-    p.setAttribute('stroke-linecap','round');p.setAttribute('stroke-linejoin','round');
-    s.appendChild(c);s.appendChild(p);
-  }
-  return s;
-}
-
-function nextStatus(s){
-  if(s==='Not started')return'In progress';
-  if(s==='In progress')return'Done';
-  return'Not started';
-}
-
-function setAsgnSync(state,msg){
-  document.getElementById('asgn-dot').className='asgn-sync-dot'+(state==='live'?' live':state==='error'?' error':'');
-  document.getElementById('asgn-sync-msg').textContent=msg;
-}
-
-function renderAssignments(){
-  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());
-  const groups={'Not started':[],'In progress':[],'Done':[]};
-  assignments.forEach(a=>{(groups[a.status]??groups['Not started']).push(a);});
-
-  [['not-started','Not started'],['in-progress','In progress'],['done','Done']].forEach(([id,key])=>{
-    const wrap=document.getElementById('asgn-'+id);
-    wrap.innerHTML='';
-    const list=groups[key];
-    if(!list.length){wrap.innerHTML='<div class="asgn-empty">—</div>';return;}
-    list.forEach(a=>{
-      const overdue=a.due&&a.due<today&&a.status!=='Done';
-      const div=document.createElement('div');
-      div.className='asgn-item';
-      const statusEl=statusIcon(a.status);
-      statusEl.classList.add(...['asgn-status',...(a.status==='Done'?['done']:[])]);
-      const info=document.createElement('div');
-      info.className='asgn-info';
-      info.innerHTML=`<div class="asgn-name${a.status==='Done'?' done':''}">${a.name}</div>${a.due?`<div class="asgn-due${overdue?' overdue':''}">${fmtDue(a.due)}</div>`:''}`;
-      div.appendChild(statusEl);div.appendChild(info);
-      div.onclick=()=>cycleStatus(a);
-      wrap.appendChild(div);
-    });
-  });
-}
-
-async function cycleStatus(asgn){
-  const prev=asgn.status;
-  asgn.status=nextStatus(prev);
-  renderAssignments();
-  try{
-    await notionAPI('pages/'+asgn.id,'PATCH',{properties:{'Status':{status:{name:asgn.status}}}});
-  }catch(e){
-    asgn.status=prev;
-    renderAssignments();
-    setAsgnSync('error','sync failed');
-    console.warn('Status patch failed',e);
-  }
-}
-
-async function fetchAssignments(){
-  setAsgnSync('','loading...');
-  try{
-    const data=await notionAPI('databases/'+ASSIGNMENTS_DB+'/query','POST',{
-      page_size:50,
-      sorts:[{property:'Status',direction:'ascending'},{property:'Due Date',direction:'ascending'}]
-    });
-    if(data.results){
-      assignments=data.results.map(p=>{
-        const pr=p.properties;
-        return{
-          id:p.id,
-          name:pr['Name']?.title?.[0]?.plain_text||'Untitled',
-          due:pr['Due Date']?.date?.start?.slice(0,10)||null,
-          status:pr['Status']?.status?.name||'Not started'
-        };
-      });
-    }
-    setAsgnSync('live','synced from notion');
-  }catch(e){
-    setAsgnSync('error','unavailable');
-    console.warn('Assignments fetch failed',e);
-  }
-  renderAssignments();
-}
-
-fetchAssignments();
-
-/* ── CANVAS SYNC ── */
-const CANVAS_BASE      = 'https://umassmed.instructure.com/api/v1';
-const CANVAS_TOKEN_KEY = 'canvas_api_token_v1';
-
-async function canvasFetch(path, params={}){
-  const token=localStorage.getItem(CANVAS_TOKEN_KEY);
-  if(!token)throw new Error('no_token');
-  const p=new URLSearchParams({...params,access_token:token,per_page:'100'});
-  const url=CANVAS_BASE+path+'?'+p.toString();
-  const r=await fetch(NOTION_PROXY+encodeURIComponent(url));
-  const data=await r.json();
-  if(data&&data.errors)throw new Error(data.errors[0]?.message||'canvas_error');
-  return data;
-}
-
-function triggerCanvasSync(){
-  if(localStorage.getItem(CANVAS_TOKEN_KEY)){
-    runCanvasSync();
-  } else {
-    const row=document.getElementById('canvas-token-row');
-    row.style.display='flex';
-    document.getElementById('canvas-token-input').focus();
-  }
-}
-
-function saveCanvasToken(){
-  const val=document.getElementById('canvas-token-input').value.trim();
-  if(!val)return;
-  localStorage.setItem(CANVAS_TOKEN_KEY,val);
-  document.getElementById('canvas-token-row').style.display='none';
-  document.getElementById('canvas-token-input').value='';
-  runCanvasSync();
-}
-
-document.getElementById('canvas-token-input').addEventListener('keydown',e=>{
-  if(e.key==='Enter')saveCanvasToken();
-  if(e.key==='Escape')document.getElementById('canvas-token-row').style.display='none';
+/* ── REDRAW ON DARK MODE CHANGE ── */
+darkMQ.addEventListener('change',()=>{
+  drawMoon(document.getElementById('moon-icon'),moonPhase);
+  if(lastWxCode!==null)drawIcon(document.getElementById('wx-icon'),lastWxCode,lastIsDay===0);
 });
-
-async function runCanvasSync(){
-  const btn=document.getElementById('canvas-sync-btn');
-  btn.textContent='↓ syncing...';btn.disabled=true;
-  setAsgnSync('','syncing from canvas...');
-  try{
-    const courses=await canvasFetch('/courses',{
-      enrollment_state:'active','enrollment_type[]':'student','state[]':'available'
-    });
-    if(!Array.isArray(courses))throw new Error('canvas_error');
-
-    const all=[];
-    for(const course of courses){
-      try{
-        const asgns=await canvasFetch(`/courses/${course.id}/assignments`,{'include[]':'submission',order_by:'due_at'});
-        if(Array.isArray(asgns)){
-          const cname=course.name||course.course_code||`Course ${course.id}`;
-          asgns.forEach(a=>{a._course=cname;});
-          all.push(...asgns);
-        }
-      }catch(e){/* skip failed course */}
-    }
-
-    const existing=await notionAPI('databases/'+ASSIGNMENTS_DB+'/query','POST',{page_size:100});
-    const byCanvasId={};
-    (existing.results||[]).forEach(p=>{
-      const cid=p.properties['Canvas ID']?.rich_text?.[0]?.plain_text;
-      if(cid)byCanvasId[cid]=p.id;
-    });
-
-    let created=0,updated=0;
-    for(const asgn of all){
-      const cid=String(asgn.id);
-      const sub=asgn.submission||{};
-      const wf=sub.workflow_state||'unsubmitted';
-      const due=asgn.due_at?asgn.due_at.slice(0,10):null;
-      const props={
-        'Name':         {title:[{text:{content:asgn.name.slice(0,2000)}}]},
-        'Canvas ID':    {rich_text:[{text:{content:cid}}]},
-        'Course':       {select:{name:(course=>course.slice(0,100))(asgn._course)}},
-        'Due Date':     due?{date:{start:due}}:{date:null},
-        'Submitted':    {checkbox:['submitted','graded','pending_review'].includes(wf)},
-        'Graded':       {checkbox:wf==='graded'},
-      };
-      if(asgn.points_possible!=null)props['Points Possible']={number:asgn.points_possible};
-      if(sub.score!=null)props['Score']={number:sub.score};
-      if(asgn.html_url)props['Canvas URL']={url:asgn.html_url};
-      try{
-        if(cid in byCanvasId){
-          await notionAPI('pages/'+byCanvasId[cid],'PATCH',{properties:props});
-          updated++;
-        } else {
-          props['Status']={status:{name:'Not started'}};
-          await notionAPI('pages','POST',{parent:{database_id:ASSIGNMENTS_DB},properties:props});
-          created++;
-        }
-      }catch(e){/* skip */}
-    }
-
-    setAsgnSync('live',`canvas synced · ${created} new, ${updated} updated`);
-    setTimeout(fetchAssignments,800);
-
-  }catch(e){
-    if(e.message==='no_token'){
-      document.getElementById('canvas-token-row').style.display='flex';
-    } else if(e.message.toLowerCase().includes('invalid')||e.message.includes('401')){
-      localStorage.removeItem(CANVAS_TOKEN_KEY);
-      setAsgnSync('error','token invalid — click sync to re-enter');
-    } else {
-      setAsgnSync('error','canvas sync failed');
-    }
-    console.warn('Canvas sync error',e);
-  }
-  btn.textContent='↓ sync canvas';btn.disabled=false;
-}
 </script>
 </body>
 </html>
